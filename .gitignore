@@ -3,13 +3,13 @@
 __pycache__/
 *.pyc
 
-# local MySQL instance + raw DB dumps (large; see README to fetch)
+# local MySQL instance + extracted dumps (regenerable from the committed tarball)
 db/mysql_data/
 db/*.sql
-db/*.tar.gz
 db/*.sock
 db/*.log
 db/mysqld.pid
+# NOTE: db/alkabor.tar.gz (the ~12MB source DB) IS committed for reproducibility.
 
 # third-party quest scripts (clone from EQMacEmu/quests; see README)
 quests/

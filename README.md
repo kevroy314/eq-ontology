@@ -32,7 +32,7 @@ Then open <http://localhost:8787>. Sections: the verdict, a city-cluster leaderb
 
 ## Reproducing from scratch
 
-The raw database and the third-party quest scripts are **not** committed (size / provenance). To regenerate:
+**Full step-by-step guide: [REPRODUCE.md](REPRODUCE.md).** The source database is committed as `db/alkabor.tar.gz` (~12 MB); the third-party quest scripts (`EQMacEmu/quests`) are cloned separately. Short version:
 
 1. **Database.** Download the Alkabor full dump from
    `EQMacEmu/Server` → `utils/sql/database_full/` and load it into a local MySQL 5.7:
