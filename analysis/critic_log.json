@@ -1,0 +1,17 @@
+{
+  "description": "Phase 5 vision-critic loop: each round a Sonnet vision agent scored a render of the anchored layout against readability criteria (Purchase/Ware/Huang/Gestalt), then concrete fixes were applied and the graph re-rendered. Screenshots: critic_r{1,2,3}_{full,zoom}.png.",
+  "rounds": [
+    {"round": 1, "scores": {"crossings": 3, "edge_geometry": 3, "cluster_separation": 5, "label_legibility": 5, "whitespace": 4, "overall": 4},
+     "applied_next": ["route cross-faction edges through PERIMETER gateways (not the centroid) to break the starburst",
+                      "increase cola group padding 9->20 so faction blobs stop overlapping",
+                      "stop truncating faction labels; add label breathing room"]},
+    {"round": 2, "scores": {"crossings": 4, "edge_geometry": 5, "cluster_separation": 5, "label_legibility": 6, "whitespace": 5, "overall": 5},
+     "applied_next": ["fan each edge's gateway by its source position so terminations spread across the blob perimeter arc",
+                      "raise hull fill/stroke visibility so faint blobs (e.g. Steel Warriors) read"]},
+    {"round": 3, "scores": {"crossings": 5, "edge_geometry": 5, "cluster_separation": 7, "label_legibility": 6, "whitespace": 5, "overall": 5},
+     "verdict": "reads as a more deliberate, hand-tuned figure; residual convergence at Ebon Strongbear is a genuine high-degree hub in the data, not a layout artifact (diminishing returns).",
+     "remaining_inherent": ["hub convergence (one NPC is a shared-item hub for many)",
+                            "whitespace imbalance driven by faithful spawn geography (dense guild district vs sparse edges)",
+                            "long cross-canvas links need obstacle-avoiding routing (future work)"]}
+  ]
+}

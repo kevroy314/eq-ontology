@@ -258,7 +258,8 @@
   <div class="ontwrap"><svg id="ego"></svg></div>
   <div class="triples" id="triples"></div>
 
-  <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–4 · experimental</span></h3>
+  <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–5 · experimental</span></h3>
+  <p class="lede" style="margin:0 0 8px;font-size:14px;color:var(--mut)"><b>Phase 5 — the vision-critic loop:</b> a separate vision-capable LLM scored screenshots of this layout against readability criteria (crossings, cluster separation, label legibility) and its critiques drove three rounds of automated fixes — <b>overall 4→5/10</b>, <b>cluster separation 5→7</b> — fixing gateway starbursts, blob overlap, and truncated labels. The model emits <em>critiques</em>, not coordinates; the solver does the geometry.</p>
   <p class="lede" style="margin-bottom:8px">The <a href="paper.html">paper's</a> proposal, built: NPCs <b>seeded at real spawn coordinates</b>, factions as <b>containment groups</b>, relaxed by a constraint solver (<a href="https://ifit.github.io/cola.js/" rel="noopener">cola.js</a>); organic <b>Bubble-set hulls</b> + gateway-<b>bundled</b> cross-faction links (P2); <b>semantic-zoom labels</b> (P3). <b>Phase 4 — click a faction blob to focus it</b>: that faction expands fully, its connected factions highlight, and everything else collapses to <b>super-nodes</b> whose <b>self-loops show internal connectivity</b> (“◎ full view” to reset). Drag to pan · scroll/pinch to zoom · hover for tooltips · click a node → explorer above.</p>
   <div class="zctl" id="anchBtns"></div>
   <div class="zctl">
@@ -272,9 +273,9 @@
   <div class="zolegend">
     <span><span class="swatch sq" style="background:#f2b705"></span>quest-giver</span>
     <span><span class="swatch" style="background:#7fb2e8"></span>NPC (colour = faction)</span>
-    <span><span class="swatch" style="background:#7ee0a0"></span>shared item (same faction)</span>
-    <span><span class="swatch" style="background:#f0a35e"></span>shared item (cross-faction, bundled)</span>
-    <span>soft blobs = faction groups · drag to pan · scroll/pinch to zoom · click a node → explorer above</span>
+    <span><span class="swatch" style="background:#7ee0a0"></span>shared item</span>
+    <span><span class="swatch" style="background:#c98bdb"></span>dialogue mention</span>
+    <span>cross-faction links bundle through gateways · soft blobs = faction groups · drag/scroll/pinch · click a node → explorer</span>
   </div>
 </section>
 
@@ -566,6 +567,21 @@ function smoothClosed(P){
   return d+'Z';
 }
 const mean=(a,f)=>a.reduce((s,m)=>s+f(m),0)/a.length;
+// smooth open curve through all points (edge bundling: route via faction gateways)
+function catmull(P){
+  if(P.length<2) return '';
+  const q=[P[0],...P,P[P.length-1]];
+  let d=`M ${P[0].x.toFixed(1)},${P[0].y.toFixed(1)} `;
+  for(let i=1;i<q.length-2;i++){const p0=q[i-1],p1=q[i],p2=q[i+1],p3=q[i+2];
+    d+=`C ${(p1.x+(p2.x-p0.x)/6).toFixed(1)},${(p1.y+(p2.y-p0.y)/6).toFixed(1)} `+
+       `${(p2.x-(p3.x-p1.x)/6).toFixed(1)},${(p2.y-(p3.y-p1.y)/6).toFixed(1)} `+
+       `${p2.x.toFixed(1)},${p2.y.toFixed(1)} `;}
+  return d;
+}
+const edgeColor=t=>t==='mention'?'#c98bdb':'#7ee0a0';   // dialogue mention vs shared item
+// perimeter gateway that fans by source position: blend "toward other faction" with "toward this node"
+function gate(C,O,n,r){let dx=(O.x-C.x)+0.6*(n.x-C.x), dy=(O.y-C.y)+0.6*(n.y-C.y);
+  const L=Math.hypot(dx,dy)||1; return {x:C.x+dx/L*r, y:C.y+dy/L*r};}
 function anchInit(){
   fetch('data/anchored_manifest.json').then(r=>r.json()).then(man=>{
     const bt=document.getElementById('anchBtns');
@@ -618,7 +634,7 @@ function runCola(d){
   // removal can separate NPCs that share an identical spawn point
   const jit=i=>[((i*2654435761)%17-8)*1.4, ((i*40503+7)%17-8)*1.4];
   const nodes=d.nodes.map((n,i)=>{const [jx,jy]=jit(i);return {x:n.x+jx,y:n.y+jy,width:15,height:15,fac:n.fac,idx:i};});
-  const groups=d.groups.map(g=>({leaves:g.leaves.slice(),padding:9,fac:g.fac,label:g.label}));
+  const groups=d.groups.map(g=>({leaves:g.leaves.slice(),padding:20,fac:g.fac,label:g.label}));
   // real (shared-item) links, drawn; + invisible per-faction cohesion links so
   // groups stay together even at the emergent end
   const links=d.links.map(l=>({source:l.source,target:l.target}));
@@ -675,22 +691,26 @@ function hullShape(ms,c,pad,fillo,stroko,sw){
 function anchDrawFull(gg,eg,ng){
   const {d,nodes,groups,links}=anchState;
   const nodeOf=L=>(typeof L==='number')?nodes[L]:L;   // cola mutates leaves/link-ends to node refs
-  const groupsMeta=[], cent={};
-  groups.forEach(g=>{const ms=g.leaves.map(nodeOf).filter(Boolean); if(ms.length)
-    cent[g.fac]={x:mean(ms,m=>m.x),y:mean(ms,m=>m.y)};});
+  const groupsMeta=[], cent={}, facRad={};
+  groups.forEach(g=>{const ms=g.leaves.map(nodeOf).filter(Boolean); if(!ms.length)return;
+    const c={x:mean(ms,m=>m.x),y:mean(ms,m=>m.y)}; cent[g.fac]=c;
+    facRad[g.fac]=Math.max(18,...ms.map(m=>Math.hypot(m.x-c.x,m.y-c.y)))+16;});   // perimeter gateway radius
   groups.forEach(g=>{
     const ms=g.leaves.map(nodeOf).filter(Boolean); if(ms.length<1) return;
-    const c=facColor(g.fac), sh=hullShape(ms,c,24,.11,.5,1.4);
+    const c=facColor(g.fac), sh=hullShape(ms,c,18,.13,.72,1.7);
     sh.style.cursor='pointer'; sh.onclick=(e)=>{e.stopPropagation();anchFocus=g.fac;anchT={z:1,x:0,y:0};anchDraw();};
     gg.appendChild(sh);
     groupsMeta.push({fac:g.fac,label:g.label,cx:mean(ms,m=>m.x),topY:Math.min(...ms.map(m=>m.y))-13});
   });
+  // edges: cross-faction bundle out through PERIMETER gateways (fan at blob edge, not centre)
   links.forEach(l=>{const s=nodeOf(l.source),t=nodeOf(l.target); if(!s||!t)return;
+    const col=edgeColor(l.type);
     if(s.fac && t.fac && s.fac!==t.fac && cent[s.fac] && cent[t.fac]){
-      const a=cent[s.fac], b=cent[t.fac];
-      eg.appendChild(svel('path',{d:`M ${s.x},${s.y} C ${a.x},${a.y} ${b.x},${b.y} ${t.x},${t.y}`,
-        fill:'none',stroke:'#f0a35e','stroke-width':1.2,opacity:.55}));
-    } else eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:'#7ee0a0','stroke-width':1.4,opacity:.5}));});
+      const A=cent[s.fac],B=cent[t.fac];
+      const gA=gate(A,B,s,facRad[s.fac]), gB=gate(B,A,t,facRad[t.fac]);   // fanned gateways
+      eg.appendChild(svel('path',{d:catmull([{x:s.x,y:s.y},gA,gB,{x:t.x,y:t.y}]),
+        fill:'none',stroke:col,'stroke-width':1.1,opacity:.42}));
+    } else eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:col,'stroke-width':1.3,opacity:.5}));});
   d.nodes.forEach((nd,i)=>{
     const n=nodes[i], g=svel('g',{class:'egonode'});
     g.appendChild(svel('title',{})).textContent=`${nd.label}${nd.quest?' ⚔':''}`;
@@ -702,7 +722,8 @@ function anchDrawFull(gg,eg,ng){
   anchState.groupsMeta=groupsMeta; anchState.superMeta=null; anchState.focusSet=null;
   const lam=anchState.lam;
   document.getElementById('anchstats').innerHTML=
-    `<b>${d.stats.npcs}</b> NPCs · <b>${d.stats.factions}</b> faction groups · ${d.stats.links} shared-item links · `+
+    `<b>${d.stats.npcs}</b> NPCs · <b>${d.stats.factions}</b> factions · <b>${d.stats.links}</b> links `+
+    `(${d.stats.item_links||0} item + ${d.stats.mention_links||0} dialogue) · `+
     `${lam>=.85?'anchored to spawn map':lam<=.15?'emergent (solver)':'blended'} · click a blob to focus`;
 }
 // Phase 4: degree-of-interest focus — one faction expanded, others collapsed to super-nodes
@@ -778,9 +799,9 @@ function anchRelabel(){
   if(anchFocus!=null){ anchRelabelFocus(placed,fits,label); return; }
   // faction labels — highest priority, always attempt
   (groupsMeta||[]).forEach(g=>{
-    const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,24), fs=12.5;
+    const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,34), fs=12.5;
     if(sx<-60||sx>W+60||sy<-20||sy>H+20) return;
-    const w=txt.length*fs*0.56, h=fs*1.05, r={x:sx-w/2,y:sy-h,w,h};
+    const w=txt.length*fs*0.56+4, h=fs*1.05+3, r={x:sx-w/2,y:sy-h,w,h};
     if(fits(r)){placed.push(r); label(sx,sy,'middle',txt,fs,facColor(g.fac));}
   });
   // node labels — semantic zoom: quest-givers only until zoomed in, then all
@@ -791,7 +812,7 @@ function anchRelabel(){
   for(const c of cand){
     const n=nodes[c.i], sx=n.x*z+anchT.x, sy=n.y*z+anchT.y;
     if(sx<-20||sx>W+20||sy<-20||sy>H+20) continue;
-    const txt=short(c.nd.label,22), w=txt.length*fs*0.56, h=fs*1.05;
+    const txt=short(c.nd.label,22), w=txt.length*fs*0.56+3, h=fs*1.05+3;
     for(const [lx,ly,anc] of [[sx+7,sy+3.5,'start'],[sx-7,sy+3.5,'end'],[sx,sy-6,'middle'],[sx,sy+h+2,'middle']]){
       const bx=anc==='start'?lx:anc==='end'?lx-w:lx-w/2, r={x:bx,y:ly-h,w,h};
       if(fits(r)){placed.push(r); label(lx,ly,anc,txt,fs,c.q?'#f2d98a':'#c3cedb'); break;}
@@ -802,7 +823,7 @@ function anchRelabelFocus(placed,fits,label){
   const {d,nodes,groupsMeta,superMeta,focusSet}=anchState, z=anchT.z, W=d.W, H=d.H;
   const off=(sx,sy)=>sx<-60||sx>W+60||sy<-20||sy>H+20;
   // focus faction hull label
-  (groupsMeta||[]).forEach(g=>{const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,24), fs=14;
+  (groupsMeta||[]).forEach(g=>{const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,34), fs=14;
     if(off(sx,sy))return; const w=txt.length*fs*0.56,h=fs*1.05,r={x:sx-w/2,y:sy-h,w,h};
     if(fits(r)){placed.push(r); label(sx,sy,'middle',txt,fs,facColor(g.fac));}});
   // super-node labels (neighbours first, then by size)

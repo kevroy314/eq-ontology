@@ -12,7 +12,7 @@ def q(s, a=None): cur.execute(s, a); return cur.fetchall()
 
 QZONES = ["qeynos", "qeynos2", "qcat", "qeytoqrg", "qrg", "freportw", "rivervale"]
 ITEM_CAP = 40          # non-commodity
-MAX_HOLDERS = 5        # only rare, specific shared items become links (avoid cliques)
+MAX_HOLDERS = 8        # rare/specific shared items become links (avoid huge cliques)
 
 def clean(s): return (s or "").replace("_", " ").strip("# ").strip() or "?"
 zmeta = {sn: clean(ln) for sn, ln in q("SELECT short_name,long_name FROM zone")}
@@ -40,6 +40,14 @@ def npc_items(nid):
     if lt: its |= loot_items.get(lt, set())
     if mid: its |= merch_items.get(mid, set())
     return {i for i in its if item_freq.get(i, 0) <= ITEM_CAP}
+
+import os
+DLG = "/home/kevin/eq/analysis/dialog_edges.json"      # NPC->NPC dialogue mentions
+npc_mentions = collections.defaultdict(set)
+if os.path.exists(DLG):
+    for e in json.load(open(DLG))["edges"]:
+        t = e["target"]
+        if t.startswith("npc:"): npc_mentions[e["speaker_id"]].add(int(t[4:]))
 
 def build(zone):
     # NPC -> averaged spawn coordinate in this zone
@@ -75,19 +83,26 @@ def build(zone):
         if prim[n]: fgroups[prim[n]].append(idx[n])
     groups = [{"fac": f, "label": fac_name.get(f, "?"), "leaves": sorted(v)}
               for f, v in sorted(fgroups.items(), key=lambda kv: -len(kv[1])) if len(v) >= 1]
-    # sparse links: NPCs sharing a rare, specific item
+    # links (typed): shared rare item (green) + dialogue mention (lavender)
+    pair_type = {}
     holders = collections.defaultdict(list)
     for n in npcs:
         for it in npc_items(n): holders[it].append(n)
-    link_set = set()
     for it, hs in holders.items():
         if 2 <= len(hs) <= MAX_HOLDERS:
             for a, b in itertools.combinations(sorted(hs), 2):
-                link_set.add((idx[a], idx[b]))
-    links = [{"source": a, "target": b} for a, b in link_set]
+                pair_type[(idx[a], idx[b])] = "item"
+    nset = set(npcs)
+    for sp in npcs:                                    # intra-zone dialogue mentions
+        for tg in npc_mentions.get(sp, ()):
+            if tg in nset and tg != sp:
+                pair_type[tuple(sorted((idx[sp], idx[tg])))] = "mention"   # mention overrides item
+    links = [{"source": a, "target": b, "type": t} for (a, b), t in pair_type.items()]
+    ni = sum(1 for l in links if l["type"] == "item"); nm = len(links) - ni
     return {"zone": zone, "long": zmeta.get(zone, zone), "W": W, "H": H,
             "nodes": nodes, "groups": groups, "links": links,
             "stats": {"npcs": len(npcs), "factions": len(groups), "links": len(links),
+                      "item_links": ni, "mention_links": nm,
                       "quest": sum(1 for n in nodes if n["quest"])}}
 
 manifest = []
