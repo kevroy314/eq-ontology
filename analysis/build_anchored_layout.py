@@ -53,13 +53,16 @@ def build(zone):
     npcs = sorted(coord)
     if len(npcs) < 3: return None
     idx = {n: i for i, n in enumerate(npcs)}
-    # normalize spawn coords -> canvas box (EQ y is inverted vs screen)
-    xs = [coord[n][0] for n in npcs]; ys = [coord[n][1] for n in npcs]
-    x0, x1 = min(xs), max(xs); y0, y1 = min(ys), max(ys)
+    # normalize spawn coords -> canvas box (EQ y is inverted vs screen).
+    # clip to 2..98 percentile so a few far-flung spawns don't squash the core.
+    import numpy as np
+    xs = np.array([coord[n][0] for n in npcs]); ys = np.array([coord[n][1] for n in npcs])
+    x0, x1 = np.percentile(xs, 2), np.percentile(xs, 98)
+    y0, y1 = np.percentile(ys, 2), np.percentile(ys, 98)
     W, H, pad = 1000, 720, 40
     sx = (W-2*pad)/((x1-x0) or 1); sy = (H-2*pad)/((y1-y0) or 1); s = min(sx, sy)
-    def nx(x): return pad + (x-x0)*s
-    def ny(y): return H - pad - (y-y0)*s        # flip
+    def nx(x): return max(pad, min(W-pad, pad + (x-x0)*s))       # clamp outliers to edge
+    def ny(y): return max(pad, min(H-pad, H - pad - (y-y0)*s))   # flip + clamp
     prim = {n: (nf_primary.get(npc_info[n][2], 0) or 0) for n in npcs}
     nodes = []
     for n in npcs:

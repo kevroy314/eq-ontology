@@ -1,0 +1,23 @@
+import subprocess
+from playwright.sync_api import sync_playwright
+cdp=subprocess.check_output(["/home/kevin/.claude/skills/edge-cdp-browser/scripts/cdp_url.sh"]).decode().strip()
+with sync_playwright() as p:
+    b=p.chromium.connect_over_cdp(cdp); ctx=b.contexts[0] if b.contexts else b.new_context()
+    pg=ctx.new_page(); errs=[]; pg.on("console",lambda e:errs.append(e.text) if e.type=="error" else None)
+    pg.set_viewport_size({"width":1300,"height":1050})
+    pg.goto("http://172.23.112.54:8787/",wait_until="networkidle"); pg.wait_for_timeout(2500)
+    print("cola loaded:", pg.evaluate("!!(window.cola && cola.Layout)"))
+    print("anch buttons:", pg.eval_on_selector_all("#anchBtns .btn","x=>x.length"))
+    print("anch nodes:", pg.eval_on_selector_all("#anchsvg .egonode","x=>x.length"))
+    print("anch group rects:", pg.eval_on_selector_all("#anchsvg rect[rx='14']","x=>x.length"))
+    print("stats:", pg.eval_on_selector("#anchstats","e=>e.textContent"))
+    pg.eval_on_selector("#anchsvg","e=>e.scrollIntoView({block:'center'})"); pg.wait_for_timeout(600)
+    pg.locator(".zscroll").last.screenshot(path="/home/kevin/eq/analysis/anchor_35.png")
+    # slider to 0 (pure solver)
+    pg.eval_on_selector("#anchlam","el=>{el.value=0;el.dispatchEvent(new Event('input'))}"); pg.wait_for_timeout(500)
+    pg.locator(".zscroll").last.screenshot(path="/home/kevin/eq/analysis/anchor_0.png")
+    # slider to 100 (pure spawn geography)
+    pg.eval_on_selector("#anchlam","el=>{el.value=100;el.dispatchEvent(new Event('input'))}"); pg.wait_for_timeout(500)
+    pg.locator(".zscroll").last.screenshot(path="/home/kevin/eq/analysis/anchor_100.png")
+    print("errors:", errs[:8])
+    pg.close()
