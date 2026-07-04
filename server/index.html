@@ -258,13 +258,14 @@
   <div class="ontwrap"><svg id="ego"></svg></div>
   <div class="triples" id="triples"></div>
 
-  <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–3 · experimental</span></h3>
-  <p class="lede" style="margin-bottom:8px">The <a href="paper.html">paper's</a> proposal, built: every NPC is <b>seeded at its real in-world spawn coordinate</b>, factions become <b>containment groups</b>, and a constraint solver (<a href="https://ifit.github.io/cola.js/" rel="noopener">cola.js</a>) relaxes it. <b>Phase 2</b> adds organic <b>Bubble-set-style hulls</b> and bundles cross-faction links through faction <b>gateways</b>. <b>Phase 3</b> adds <b>semantic-zoom labels</b>: faction + quest-giver names at overview, every NPC name as you zoom in — placed greedily so they never overlap. Drag to pan, scroll/pinch to zoom, hover for a tooltip. The <b>anchor</b> slider is the λ dial: <em>emergent</em> ↔ <em>anchored</em>.</p>
+  <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–4 · experimental</span></h3>
+  <p class="lede" style="margin-bottom:8px">The <a href="paper.html">paper's</a> proposal, built: NPCs <b>seeded at real spawn coordinates</b>, factions as <b>containment groups</b>, relaxed by a constraint solver (<a href="https://ifit.github.io/cola.js/" rel="noopener">cola.js</a>); organic <b>Bubble-set hulls</b> + gateway-<b>bundled</b> cross-faction links (P2); <b>semantic-zoom labels</b> (P3). <b>Phase 4 — click a faction blob to focus it</b>: that faction expands fully, its connected factions highlight, and everything else collapses to <b>super-nodes</b> whose <b>self-loops show internal connectivity</b> (“◎ full view” to reset). Drag to pan · scroll/pinch to zoom · hover for tooltips · click a node → explorer above.</p>
   <div class="zctl" id="anchBtns"></div>
   <div class="zctl">
     <button class="btn" id="anchrerun">↻ re-run solver</button>
     <span class="slider">emergent <input type="range" id="anchlam" min="0" max="100" value="60"> anchored</span>
     <button class="btn" id="anchzout">−</button><button class="btn" id="anchzin">zoom +</button>
+    <button class="btn" id="anchfull">◎ full view</button>
     <span class="zstats" id="anchstats"></span>
   </div>
   <div class="anchwrap"><svg id="anchsvg"></svg></div>
@@ -543,7 +544,7 @@ zoneInit();
 
 /* ============ PHASE 1: spatially-anchored cola.js layout ============ */
 const facColor = f => f ? `hsl(${(f*47)%360} 55% 62%)` : '#7f8a97';
-let anchCur=null, anchData={}, anchState=null, anchT={z:1,x:0,y:0}, anchWired=false, anchRelabelReq=0;
+let anchCur=null, anchData={}, anchState=null, anchT={z:1,x:0,y:0}, anchWired=false, anchRelabelReq=0, anchFocus=null;
 // --- Phase 2 geometry: convex hull (Andrew monotone chain) + Catmull-Rom smoothing ---
 function convexHull(pts){
   pts=pts.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
@@ -572,6 +573,7 @@ function anchInit(){
     bt.querySelectorAll('.btn').forEach(b=>b.onclick=()=>{bt.querySelectorAll('.btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');anchLoad(b.dataset.z);});
     document.getElementById('anchzin').onclick=()=>anchZoomAt(500,360,1.3);
     document.getElementById('anchzout').onclick=()=>anchZoomAt(500,360,1/1.3);
+    document.getElementById('anchfull').onclick=()=>{anchFocus=null;anchDraw();};
     document.getElementById('anchrerun').onclick=()=>{if(anchData[anchCur])runCola(anchData[anchCur]);};
     let deb; document.getElementById('anchlam').oninput=()=>{clearTimeout(deb);
       deb=setTimeout(()=>{if(anchData[anchCur])runCola(anchData[anchCur]);},120);};
@@ -640,57 +642,55 @@ function runCola(d){
   anchState={d,nodes,groups,links};
   const deg=new Array(d.nodes.length).fill(0);   // shared-item degree, for label priority
   d.links.forEach(l=>{deg[l.source]++;deg[l.target]++;});
-  anchState.deg=deg;
+  anchState.deg=deg; anchState.lam=lam;
   anchT={z:1,x:0,y:0};             // reset view for the new layout
   anchDraw();
-  document.getElementById('anchstats').innerHTML=
-    `<b>${d.stats.npcs}</b> NPCs · <b>${d.stats.factions}</b> faction groups · ${d.stats.links} shared-item links · `+
-    `${lam>=.85?'anchored to spawn map':lam<=.15?'emergent (solver)':'blended'} · seeded from spawn2 coords`;
 }
 function anchDraw(){
   if(!anchState) return;
-  const {d,nodes,groups,links}=anchState;
+  const {d}=anchState;
   const svg=document.getElementById('anchsvg'); svg.innerHTML='';
   svg.setAttribute('viewBox',`0 0 ${d.W} ${d.H}`);
   const root=svel('g',{id:'anchRoot'}); svg.appendChild(root);
   const gg=svel('g',{}); root.appendChild(gg);
   const eg=svel('g',{}); root.appendChild(eg);
   const ng=svel('g',{}); root.appendChild(ng);
+  if(anchFocus!=null) anchDrawFocus(gg,eg,ng); else anchDrawFull(gg,eg,ng);
+  svg.appendChild(svel('g',{id:'anchLabels'}));    // labels layer, outside the pan/zoom transform
+  applyAnchT(); wireAnch();
+}
+// blob hull path (or ellipse for 1-2 members) around the given node objects
+function hullShape(ms,c,pad,fillo,stroko,sw){
+  if(ms.length>=3){
+    const cx=mean(ms,m=>m.x), cy=mean(ms,m=>m.y), p=convexHull(ms.map(m=>({x:m.x,y:m.y})))
+      .map(q=>{const dx=q.x-cx,dy=q.y-cy,L=Math.hypot(dx,dy)||1;return {x:q.x+dx/L*pad,y:q.y+dy/L*pad};});
+    const path=smoothClosed(p);
+    if(path) return svel('path',{d:path,fill:c,'fill-opacity':fillo,stroke:c,'stroke-opacity':stroko,'stroke-width':sw});
+  }
+  const xs=ms.map(m=>m.x),ys=ms.map(m=>m.y);
+  return svel('ellipse',{cx:(Math.min(...xs)+Math.max(...xs))/2,cy:(Math.min(...ys)+Math.max(...ys))/2,
+    rx:(Math.max(...xs)-Math.min(...xs))/2+pad+2,ry:(Math.max(...ys)-Math.min(...ys))/2+pad,
+    fill:c,'fill-opacity':fillo,stroke:c,'stroke-opacity':stroko,'stroke-width':sw});
+}
+function anchDrawFull(gg,eg,ng){
+  const {d,nodes,groups,links}=anchState;
   const nodeOf=L=>(typeof L==='number')?nodes[L]:L;   // cola mutates leaves/link-ends to node refs
-  const groupsMeta=[];
-  // faction centroids = edge-bundling gateways
-  const cent={};
+  const groupsMeta=[], cent={};
   groups.forEach(g=>{const ms=g.leaves.map(nodeOf).filter(Boolean); if(ms.length)
     cent[g.fac]={x:mean(ms,m=>m.x),y:mean(ms,m=>m.y)};});
-  // organic Bubble-set-style hulls (Phase 2)
   groups.forEach(g=>{
     const ms=g.leaves.map(nodeOf).filter(Boolean); if(ms.length<1) return;
-    const c=facColor(g.fac), cx=mean(ms,m=>m.x), cy=mean(ms,m=>m.y);
-    let path=null;
-    if(ms.length>=3){
-      const pad=24;
-      const hull=convexHull(ms.map(m=>({x:m.x,y:m.y}))).map(p=>{
-        const dx=p.x-cx,dy=p.y-cy,L=Math.hypot(dx,dy)||1; return {x:p.x+dx/L*pad,y:p.y+dy/L*pad};});
-      path=smoothClosed(hull);
-    }
-    if(path){ gg.appendChild(svel('path',{d:path,fill:c,'fill-opacity':.11,stroke:c,'stroke-opacity':.5,'stroke-width':1.4})); }
-    else {  // 1-2 members: soft blob
-      const xs=ms.map(m=>m.x),ys=ms.map(m=>m.y);
-      const bx=(Math.min(...xs)+Math.max(...xs))/2, by=(Math.min(...ys)+Math.max(...ys))/2;
-      gg.appendChild(svel('ellipse',{cx:bx,cy:by,rx:(Math.max(...xs)-Math.min(...xs))/2+26,
-        ry:(Math.max(...ys)-Math.min(...ys))/2+22,fill:c,'fill-opacity':.11,stroke:c,'stroke-opacity':.5,'stroke-width':1.4}));
-    }
-    groupsMeta.push({fac:g.fac,label:g.label,cx,topY:Math.min(...ms.map(m=>m.y))-13});
+    const c=facColor(g.fac), sh=hullShape(ms,c,24,.11,.5,1.4);
+    sh.style.cursor='pointer'; sh.onclick=(e)=>{e.stopPropagation();anchFocus=g.fac;anchT={z:1,x:0,y:0};anchDraw();};
+    gg.appendChild(sh);
+    groupsMeta.push({fac:g.fac,label:g.label,cx:mean(ms,m=>m.x),topY:Math.min(...ms.map(m=>m.y))-13});
   });
-  // edges: intra-faction straight (green); cross-faction bundled through gateways (amber)
   links.forEach(l=>{const s=nodeOf(l.source),t=nodeOf(l.target); if(!s||!t)return;
     if(s.fac && t.fac && s.fac!==t.fac && cent[s.fac] && cent[t.fac]){
       const a=cent[s.fac], b=cent[t.fac];
       eg.appendChild(svel('path',{d:`M ${s.x},${s.y} C ${a.x},${a.y} ${b.x},${b.y} ${t.x},${t.y}`,
         fill:'none',stroke:'#f0a35e','stroke-width':1.2,opacity:.55}));
-    } else {
-      eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:'#7ee0a0','stroke-width':1.4,opacity:.5}));
-    }});
+    } else eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:'#7ee0a0','stroke-width':1.4,opacity:.5}));});
   d.nodes.forEach((nd,i)=>{
     const n=nodes[i], g=svel('g',{class:'egonode'});
     g.appendChild(svel('title',{})).textContent=`${nd.label}${nd.quest?' ⚔':''}`;
@@ -699,9 +699,70 @@ function anchDraw(){
     g.onclick=()=>centerOn('npc:'+nd.id);
     ng.appendChild(g);
   });
-  svg.appendChild(svel('g',{id:'anchLabels'}));    // labels: constant-size, outside the pan/zoom transform
-  anchState.groupsMeta=groupsMeta;
-  applyAnchT(); wireAnch();
+  anchState.groupsMeta=groupsMeta; anchState.superMeta=null; anchState.focusSet=null;
+  const lam=anchState.lam;
+  document.getElementById('anchstats').innerHTML=
+    `<b>${d.stats.npcs}</b> NPCs · <b>${d.stats.factions}</b> faction groups · ${d.stats.links} shared-item links · `+
+    `${lam>=.85?'anchored to spawn map':lam<=.15?'emergent (solver)':'blended'} · click a blob to focus`;
+}
+// Phase 4: degree-of-interest focus — one faction expanded, others collapsed to super-nodes
+function anchDrawFocus(gg,eg,ng){
+  const {d,nodes}=anchState, F=anchFocus;
+  const facLabel=new Map(d.groups.map(g=>[g.fac,g.label]));
+  const facOf=d.nodes.map(n=>n.fac);
+  const fac2=new Map();
+  d.nodes.forEach((nd,i)=>{ if(!fac2.has(nd.fac))fac2.set(nd.fac,[]); fac2.get(nd.fac).push(i); });
+  const cent=new Map();
+  for(const [f,idxs] of fac2) cent.set(f,{x:mean(idxs,i=>nodes[i].x),y:mean(idxs,i=>nodes[i].y)});
+  // aggregate edges: self-loops (intra collapsed), super<->super, and focus<->other
+  const selfCnt=new Map(), superEdge=new Map(), focusOut=[];
+  d.links.forEach(l=>{const fa=facOf[l.source],fb=facOf[l.target];
+    if(fa===fb){ if(fa!==F) selfCnt.set(fa,(selfCnt.get(fa)||0)+1); }
+    else if(fa===F) focusOut.push({src:l.source,g:fb});
+    else if(fb===F) focusOut.push({src:l.target,g:fa});
+    else { const k=fa<fb?fa+'|'+fb:fb+'|'+fa; superEdge.set(k,(superEdge.get(k)||0)+1); }});
+  const neigh=new Set(focusOut.map(o=>o.g));
+  const rf=f=>7+Math.sqrt((fac2.get(f)||[]).length)*2.2;   // super-node radius
+  // super<->super aggregated links (dim, width by count), clipped to circle edges
+  for(const [k,cc] of superEdge){const [fa,fb]=k.split('|').map(Number),A=cent.get(fa),B=cent.get(fb); if(!A||!B)continue;
+    const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1,ra=rf(fa),rb=rf(fb);
+    eg.appendChild(svel('line',{x1:A.x+dx/L*ra,y1:A.y+dy/L*ra,x2:B.x-dx/L*rb,y2:B.y-dy/L*rb,
+      stroke:'#5a6572','stroke-width':Math.min(4,.6+cc*.5),opacity:.22}));}
+  const superMeta=[];
+  // super-nodes for every non-focus faction (+ self-loop if internal links)
+  for(const [f,idxs] of fac2){ if(f===F||!f) continue;
+    const c=cent.get(f), n=idxs.length, col=facColor(f), r=7+Math.sqrt(n)*2.2, isN=neigh.has(f);
+    const grp=svel('g',{class:'egonode'}); grp.style.opacity=isN?1:.42;
+    const sc=selfCnt.get(f)||0;
+    if(sc>0){ const lr=r*0.55;   // self-loop arc = this faction's internal connectivity
+      grp.appendChild(svel('path',{d:`M ${c.x-lr},${c.y-r*0.7} C ${c.x-r*2.4},${c.y-r*3.3} ${c.x+r*2.4},${c.y-r*3.3} ${c.x+lr},${c.y-r*0.7}`,
+        fill:'none',stroke:col,'stroke-width':1.4,opacity:.85})); }
+    grp.appendChild(svel('circle',{cx:c.x,cy:c.y,r,fill:col,'fill-opacity':.22,stroke:col,'stroke-width':1.7}));
+    grp.appendChild(svel('title',{})).textContent=`${facLabel.get(f)||('faction '+f)} · ${n} NPCs${sc?` · ${sc} internal links (self-loop)`:''}`;
+    grp.onclick=(e)=>{e.stopPropagation();anchFocus=f;anchT={z:1,x:0,y:0};anchDraw();};
+    ng.appendChild(grp);
+    superMeta.push({fac:f,label:facLabel.get(f)||('faction '+f),x:c.x,y:c.y-r-5,count:n,neighbor:isN});
+  }
+  // focus faction expanded
+  const Fidx=fac2.get(F)||[], ms=Fidx.map(i=>nodes[i]), inF=new Set(Fidx);
+  if(ms.length) gg.appendChild(hullShape(ms,facColor(F),26,.13,.6,1.9));
+  d.links.forEach(l=>{ if(inF.has(l.source)&&inF.has(l.target)){const s=nodes[l.source],t=nodes[l.target];
+    eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:'#7ee0a0','stroke-width':1.5,opacity:.6}));}});
+  focusOut.forEach(o=>{const s=nodes[o.src],g=cent.get(o.g); if(!s||!g)return;
+    const dx=g.x-s.x,dy=g.y-s.y,L=Math.hypot(dx,dy)||1,rb=rf(o.g);
+    eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:g.x-dx/L*rb,y2:g.y-dy/L*rb,stroke:'#f0a35e','stroke-width':1.1,opacity:.5}));});
+  Fidx.forEach(i=>{const nd=d.nodes[i], n=nodes[i], g=svel('g',{class:'egonode'});
+    g.appendChild(svel('title',{})).textContent=`${nd.label}${nd.quest?' ⚔':''}`;
+    if(nd.quest) g.appendChild(svel('rect',{x:n.x-4.5,y:n.y-4.5,width:9,height:9,fill:'#f2b705',stroke:'#1b1200','stroke-width':.7}));
+    else g.appendChild(svel('circle',{cx:n.x,cy:n.y,r:4.4,fill:facColor(nd.fac),stroke:'#0b0e13','stroke-width':.8}));
+    g.onclick=()=>centerOn('npc:'+nd.id);
+    ng.appendChild(g);});
+  anchState.superMeta=superMeta; anchState.focusSet=Fidx;
+  anchState.groupsMeta = ms.length ? [{fac:F,label:facLabel.get(F)||('faction '+F),
+    cx:cent.get(F).x,topY:Math.min(...ms.map(m=>m.y))-14}] : [];
+  document.getElementById('anchstats').innerHTML=
+    `focused on <b style="color:${facColor(F)}">${facLabel.get(F)||('faction '+F)}</b> (${Fidx.length} NPCs) · `+
+    `<b>${neigh.size}</b> connected factions · others collapsed to super-nodes (loops = internal links)`;
 }
 /* Phase 3: semantic-zoom, non-overlapping labels (greedy multi-position, Imhof-style) */
 function anchRelabel(){
@@ -714,6 +775,7 @@ function anchRelabel(){
   const halo={stroke:'#0b0e13','stroke-width':2.6,'paint-order':'stroke','stroke-linejoin':'round'};
   const label=(x,y,anc,txt,fs,fill)=>{const t=svel('text',Object.assign({x:x.toFixed(1),y:y.toFixed(1),
     'text-anchor':anc,'font-size':fs,fill},halo)); t.textContent=txt; L.appendChild(t);};
+  if(anchFocus!=null){ anchRelabelFocus(placed,fits,label); return; }
   // faction labels — highest priority, always attempt
   (groupsMeta||[]).forEach(g=>{
     const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,24), fs=12.5;
@@ -735,6 +797,27 @@ function anchRelabel(){
       if(fits(r)){placed.push(r); label(lx,ly,anc,txt,fs,c.q?'#f2d98a':'#c3cedb'); break;}
     }
   }
+}
+function anchRelabelFocus(placed,fits,label){
+  const {d,nodes,groupsMeta,superMeta,focusSet}=anchState, z=anchT.z, W=d.W, H=d.H;
+  const off=(sx,sy)=>sx<-60||sx>W+60||sy<-20||sy>H+20;
+  // focus faction hull label
+  (groupsMeta||[]).forEach(g=>{const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,24), fs=14;
+    if(off(sx,sy))return; const w=txt.length*fs*0.56,h=fs*1.05,r={x:sx-w/2,y:sy-h,w,h};
+    if(fits(r)){placed.push(r); label(sx,sy,'middle',txt,fs,facColor(g.fac));}});
+  // super-node labels (neighbours first, then by size)
+  (superMeta||[]).slice().sort((a,b)=>(b.neighbor-a.neighbor)||(b.count-a.count)).forEach(s=>{
+    const sx=s.x*z+anchT.x, sy=s.y*z+anchT.y, txt=short(s.label,18)+' ·'+s.count, fs=11.5;
+    if(off(sx,sy))return; const w=txt.length*fs*0.55,h=fs*1.05,r={x:sx-w/2,y:sy-h,w,h};
+    if(fits(r)){placed.push(r); label(sx,sy,'middle',txt,fs,facColor(s.fac));}});
+  // focus member labels (the working set — all of them, greedy)
+  const fs=10.5;
+  (focusSet||[]).forEach(i=>{const nd=d.nodes[i], n=nodes[i], sx=n.x*z+anchT.x, sy=n.y*z+anchT.y;
+    if(off(sx,sy))return; const txt=short(nd.label,20),w=txt.length*fs*0.56,h=fs*1.05;
+    for(const [lx,ly,anc] of [[sx+7,sy+3.5,'start'],[sx-7,sy+3.5,'end'],[sx,sy-6,'middle'],[sx,sy+h+2,'middle']]){
+      const bx=anc==='start'?lx:anc==='end'?lx-w:lx-w/2, r={x:bx,y:ly-h,w,h};
+      if(fits(r)){placed.push(r); label(lx,ly,anc,txt,fs,nd.quest?'#f2d98a':'#c3cedb'); break;}
+    }});
 }
 anchInit();
 
