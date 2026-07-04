@@ -258,8 +258,8 @@
   <div class="ontwrap"><svg id="ego"></svg></div>
   <div class="triples" id="triples"></div>
 
-  <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–2 · experimental</span></h3>
-  <p class="lede" style="margin-bottom:8px">The <a href="paper.html">paper's</a> proposal, built: every NPC is <b>seeded at its real in-world spawn coordinate</b>, factions become <b>containment groups</b>, and a constraint solver (<a href="https://ifit.github.io/cola.js/" rel="noopener">cola.js</a>) relaxes it — removing overlaps and tightening groups while honouring geography. <b>Phase 2</b> adds organic <b>Bubble-set-style hulls</b> and routes cross-faction links through faction <b>gateways</b> (edge bundling) so they no longer sprawl. The <b>anchor</b> slider is the λ dial: <em>emergent</em> (pure solver) ↔ <em>anchored</em> (pinned to the game map).</p>
+  <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–3 · experimental</span></h3>
+  <p class="lede" style="margin-bottom:8px">The <a href="paper.html">paper's</a> proposal, built: every NPC is <b>seeded at its real in-world spawn coordinate</b>, factions become <b>containment groups</b>, and a constraint solver (<a href="https://ifit.github.io/cola.js/" rel="noopener">cola.js</a>) relaxes it. <b>Phase 2</b> adds organic <b>Bubble-set-style hulls</b> and bundles cross-faction links through faction <b>gateways</b>. <b>Phase 3</b> adds <b>semantic-zoom labels</b>: faction + quest-giver names at overview, every NPC name as you zoom in — placed greedily so they never overlap. Drag to pan, scroll/pinch to zoom, hover for a tooltip. The <b>anchor</b> slider is the λ dial: <em>emergent</em> ↔ <em>anchored</em>.</p>
   <div class="zctl" id="anchBtns"></div>
   <div class="zctl">
     <button class="btn" id="anchrerun">↻ re-run solver</button>
@@ -543,7 +543,7 @@ zoneInit();
 
 /* ============ PHASE 1: spatially-anchored cola.js layout ============ */
 const facColor = f => f ? `hsl(${(f*47)%360} 55% 62%)` : '#7f8a97';
-let anchCur=null, anchData={}, anchState=null, anchT={z:1,x:0,y:0}, anchWired=false;
+let anchCur=null, anchData={}, anchState=null, anchT={z:1,x:0,y:0}, anchWired=false, anchRelabelReq=0;
 // --- Phase 2 geometry: convex hull (Andrew monotone chain) + Catmull-Rom smoothing ---
 function convexHull(pts){
   pts=pts.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
@@ -579,7 +579,8 @@ function anchInit(){
   });
 }
 function applyAnchT(){const r=document.getElementById('anchRoot');
-  if(r)r.setAttribute('transform',`translate(${anchT.x},${anchT.y}) scale(${anchT.z})`);}
+  if(r)r.setAttribute('transform',`translate(${anchT.x},${anchT.y}) scale(${anchT.z})`);
+  if(!anchRelabelReq) anchRelabelReq=requestAnimationFrame(()=>{anchRelabelReq=0;anchRelabel();});}
 function anchVB(cx,cy){const svg=document.getElementById('anchsvg'),pt=svg.createSVGPoint();
   pt.x=cx;pt.y=cy;const m=svg.getScreenCTM();if(!m)return[0,0];const p=pt.matrixTransform(m.inverse());return[p.x,p.y];}
 function anchZoomAt(mx,my,f){const nz=Math.max(.3,Math.min(8,anchT.z*f));f=nz/anchT.z;
@@ -637,6 +638,9 @@ function runCola(d){
   const ox=(d.W-(x1-x0)*s)/2-x0*s, oy=(d.H-(y1-y0)*s)/2-y0*s;
   nodes.forEach(n=>{n.x=n.x*s+ox; n.y=n.y*s+oy;});
   anchState={d,nodes,groups,links};
+  const deg=new Array(d.nodes.length).fill(0);   // shared-item degree, for label priority
+  d.links.forEach(l=>{deg[l.source]++;deg[l.target]++;});
+  anchState.deg=deg;
   anchT={z:1,x:0,y:0};             // reset view for the new layout
   anchDraw();
   document.getElementById('anchstats').innerHTML=
@@ -653,6 +657,7 @@ function anchDraw(){
   const eg=svel('g',{}); root.appendChild(eg);
   const ng=svel('g',{}); root.appendChild(ng);
   const nodeOf=L=>(typeof L==='number')?nodes[L]:L;   // cola mutates leaves/link-ends to node refs
+  const groupsMeta=[];
   // faction centroids = edge-bundling gateways
   const cent={};
   groups.forEach(g=>{const ms=g.leaves.map(nodeOf).filter(Boolean); if(ms.length)
@@ -675,8 +680,7 @@ function anchDraw(){
       gg.appendChild(svel('ellipse',{cx:bx,cy:by,rx:(Math.max(...xs)-Math.min(...xs))/2+26,
         ry:(Math.max(...ys)-Math.min(...ys))/2+22,fill:c,'fill-opacity':.11,stroke:c,'stroke-opacity':.5,'stroke-width':1.4}));
     }
-    if(ms.length>=2) gg.appendChild(svel('text',{x:cx,y:Math.min(...ms.map(m=>m.y))-13,'text-anchor':'middle',
-      class:'flab',fill:c})).textContent=short(g.label,24);
+    groupsMeta.push({fac:g.fac,label:g.label,cx,topY:Math.min(...ms.map(m=>m.y))-13});
   });
   // edges: intra-faction straight (green); cross-faction bundled through gateways (amber)
   links.forEach(l=>{const s=nodeOf(l.source),t=nodeOf(l.target); if(!s||!t)return;
@@ -695,7 +699,42 @@ function anchDraw(){
     g.onclick=()=>centerOn('npc:'+nd.id);
     ng.appendChild(g);
   });
+  svg.appendChild(svel('g',{id:'anchLabels'}));    // labels: constant-size, outside the pan/zoom transform
+  anchState.groupsMeta=groupsMeta;
   applyAnchT(); wireAnch();
+}
+/* Phase 3: semantic-zoom, non-overlapping labels (greedy multi-position, Imhof-style) */
+function anchRelabel(){
+  const svg=document.getElementById('anchsvg'); if(!svg||!anchState) return;
+  let L=document.getElementById('anchLabels');
+  if(!L){L=svel('g',{id:'anchLabels'}); svg.appendChild(L);} L.textContent='';
+  const {d,nodes,groupsMeta,deg}=anchState, z=anchT.z, W=d.W, H=d.H;
+  const placed=[];
+  const fits=r=>!placed.some(p=>!(r.x+r.w<p.x||r.x>p.x+p.w||r.y+r.h<p.y||r.y>p.y+p.h));
+  const halo={stroke:'#0b0e13','stroke-width':2.6,'paint-order':'stroke','stroke-linejoin':'round'};
+  const label=(x,y,anc,txt,fs,fill)=>{const t=svel('text',Object.assign({x:x.toFixed(1),y:y.toFixed(1),
+    'text-anchor':anc,'font-size':fs,fill},halo)); t.textContent=txt; L.appendChild(t);};
+  // faction labels — highest priority, always attempt
+  (groupsMeta||[]).forEach(g=>{
+    const sx=g.cx*z+anchT.x, sy=g.topY*z+anchT.y, txt=short(g.label,24), fs=12.5;
+    if(sx<-60||sx>W+60||sy<-20||sy>H+20) return;
+    const w=txt.length*fs*0.56, h=fs*1.05, r={x:sx-w/2,y:sy-h,w,h};
+    if(fits(r)){placed.push(r); label(sx,sy,'middle',txt,fs,facColor(g.fac));}
+  });
+  // node labels — semantic zoom: quest-givers only until zoomed in, then all
+  const fs=10.5, LOD=1.3;
+  let cand=d.nodes.map((nd,i)=>({nd,i,q:nd.quest?1:0,dg:deg[i]||0}));
+  if(z<LOD) cand=cand.filter(c=>c.q);
+  cand.sort((a,b)=>(b.q-a.q)||(b.dg-a.dg));
+  for(const c of cand){
+    const n=nodes[c.i], sx=n.x*z+anchT.x, sy=n.y*z+anchT.y;
+    if(sx<-20||sx>W+20||sy<-20||sy>H+20) continue;
+    const txt=short(c.nd.label,22), w=txt.length*fs*0.56, h=fs*1.05;
+    for(const [lx,ly,anc] of [[sx+7,sy+3.5,'start'],[sx-7,sy+3.5,'end'],[sx,sy-6,'middle'],[sx,sy+h+2,'middle']]){
+      const bx=anc==='start'?lx:anc==='end'?lx-w:lx-w/2, r={x:bx,y:ly-h,w,h};
+      if(fits(r)){placed.push(r); label(lx,ly,anc,txt,fs,c.q?'#f2d98a':'#c3cedb'); break;}
+    }
+  }
 }
 anchInit();
 
