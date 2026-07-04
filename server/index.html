@@ -259,7 +259,7 @@
   <div class="triples" id="triples"></div>
 
   <h3 style="margin:30px 0 4px;font-size:16px">C. Spatially-anchored layout <span class="expbadge">Phase 1–5 · experimental</span></h3>
-  <p class="lede" style="margin:0 0 8px;font-size:14px;color:var(--mut)"><b>Phase 5 — the vision-critic loop:</b> a separate vision-capable LLM scored screenshots of this layout against readability criteria (crossings, cluster separation, label legibility) and its critiques drove three rounds of automated fixes — <b>overall 4→5/10</b>, <b>cluster separation 5→7</b> — fixing gateway starbursts, blob overlap, and truncated labels. The model emits <em>critiques</em>, not coordinates; the solver does the geometry.</p>
+  <p class="lede" style="margin:0 0 8px;font-size:14px;color:var(--mut)"><b>Phase 5 — the vision-critic loop:</b> a separate vision LLM scored screenshots against readability criteria and drove <b>6 rounds</b> of fixes. The honest result: it <b>plateaus around 6/10</b> and never rubber-stamps. Aggregating the cross-faction spaghetti into one ribbon per faction pair was the real win; after that, obstacle-avoidance routing just traded blob-slicing for edge crossings (the paper's multi-objective tension, live), and the remaining ceiling is density imbalance <em>inherent to anchoring on real spawn geography</em>. Dial the <b>anchor</b> slider toward <em>emergent</em> to trade fidelity for balance, or toggle <b>connections</b> off for a clean labeled-blob overview. The model emits <em>critiques</em>, not coordinates.</p>
   <p class="lede" style="margin-bottom:8px">The <a href="paper.html">paper's</a> proposal, built: NPCs <b>seeded at real spawn coordinates</b>, factions as <b>containment groups</b>, relaxed by a constraint solver (<a href="https://ifit.github.io/cola.js/" rel="noopener">cola.js</a>); organic <b>Bubble-set hulls</b> + gateway-<b>bundled</b> cross-faction links (P2); <b>semantic-zoom labels</b> (P3). <b>Phase 4 — click a faction blob to focus it</b>: that faction expands fully, its connected factions highlight, and everything else collapses to <b>super-nodes</b> whose <b>self-loops show internal connectivity</b> (“◎ full view” to reset). Drag to pan · scroll/pinch to zoom · hover for tooltips · click a node → explorer above.</p>
   <div class="zctl" id="anchBtns"></div>
   <div class="zctl">
@@ -267,6 +267,7 @@
     <span class="slider">emergent <input type="range" id="anchlam" min="0" max="100" value="60"> anchored</span>
     <button class="btn" id="anchzout">−</button><button class="btn" id="anchzin">zoom +</button>
     <button class="btn" id="anchfull">◎ full view</button>
+    <button class="btn on" id="anchedges">⤳ connections</button>
     <span class="zstats" id="anchstats"></span>
   </div>
   <div class="anchwrap"><svg id="anchsvg"></svg></div>
@@ -275,7 +276,7 @@
     <span><span class="swatch" style="background:#7fb2e8"></span>NPC (colour = faction)</span>
     <span><span class="swatch" style="background:#7ee0a0"></span>shared item</span>
     <span><span class="swatch" style="background:#c98bdb"></span>dialogue mention</span>
-    <span>cross-faction links bundle through gateways · soft blobs = faction groups · drag/scroll/pinch · click a node → explorer</span>
+    <span>cross-faction links <b>aggregated</b> into one ribbon per faction pair (width = count); click a faction to see its individual links · drag/scroll/pinch</span>
   </div>
 </section>
 
@@ -545,7 +546,7 @@ zoneInit();
 
 /* ============ PHASE 1: spatially-anchored cola.js layout ============ */
 const facColor = f => f ? `hsl(${(f*47)%360} 55% 62%)` : '#7f8a97';
-let anchCur=null, anchData={}, anchState=null, anchT={z:1,x:0,y:0}, anchWired=false, anchRelabelReq=0, anchFocus=null;
+let anchCur=null, anchData={}, anchState=null, anchT={z:1,x:0,y:0}, anchWired=false, anchRelabelReq=0, anchFocus=null, anchEdges=true;
 // --- Phase 2 geometry: convex hull (Andrew monotone chain) + Catmull-Rom smoothing ---
 function convexHull(pts){
   pts=pts.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
@@ -582,6 +583,9 @@ const edgeColor=t=>t==='mention'?'#c98bdb':'#7ee0a0';   // dialogue mention vs s
 // perimeter gateway that fans by source position: blend "toward other faction" with "toward this node"
 function gate(C,O,n,r){let dx=(O.x-C.x)+0.6*(n.x-C.x), dy=(O.y-C.y)+0.6*(n.y-C.y);
   const L=Math.hypot(dx,dy)||1; return {x:C.x+dx/L*r, y:C.y+dy/L*r};}
+function distSeg(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1;
+  let t=((px-ax)*dx+(py-ay)*dy)/L2; t=Math.max(0,Math.min(1,t));
+  return Math.hypot(px-(ax+t*dx), py-(ay+t*dy));}
 function anchInit(){
   fetch('data/anchored_manifest.json').then(r=>r.json()).then(man=>{
     const bt=document.getElementById('anchBtns');
@@ -590,6 +594,7 @@ function anchInit(){
     document.getElementById('anchzin').onclick=()=>anchZoomAt(500,360,1.3);
     document.getElementById('anchzout').onclick=()=>anchZoomAt(500,360,1/1.3);
     document.getElementById('anchfull').onclick=()=>{anchFocus=null;anchDraw();};
+    document.getElementById('anchedges').onclick=(e)=>{anchEdges=!anchEdges;e.target.classList.toggle('on',anchEdges);anchDraw();};
     document.getElementById('anchrerun').onclick=()=>{if(anchData[anchCur])runCola(anchData[anchCur]);};
     let deb; document.getElementById('anchlam').oninput=()=>{clearTimeout(deb);
       deb=setTimeout(()=>{if(anchData[anchCur])runCola(anchData[anchCur]);},120);};
@@ -634,7 +639,7 @@ function runCola(d){
   // removal can separate NPCs that share an identical spawn point
   const jit=i=>[((i*2654435761)%17-8)*1.4, ((i*40503+7)%17-8)*1.4];
   const nodes=d.nodes.map((n,i)=>{const [jx,jy]=jit(i);return {x:n.x+jx,y:n.y+jy,width:15,height:15,fac:n.fac,idx:i};});
-  const groups=d.groups.map(g=>({leaves:g.leaves.slice(),padding:20,fac:g.fac,label:g.label}));
+  const groups=d.groups.map(g=>({leaves:g.leaves.slice(),padding:26,fac:g.fac,label:g.label}));
   // real (shared-item) links, drawn; + invisible per-faction cohesion links so
   // groups stay together even at the emergent end
   const links=d.links.map(l=>({source:l.source,target:l.target}));
@@ -702,20 +707,33 @@ function anchDrawFull(gg,eg,ng){
     gg.appendChild(sh);
     groupsMeta.push({fac:g.fac,label:g.label,cx:mean(ms,m=>m.x),topY:Math.min(...ms.map(m=>m.y))-13});
   });
-  // edges: cross-faction bundle out through PERIMETER gateways (fan at blob edge, not centre)
+  // intra-faction edges drawn individually (short, local); cross-faction edges
+  // AGGREGATED into one ribbon per faction pair (width = count) to kill the hairball.
+  // Individual cross-faction links are revealed in focus mode (detail on demand).
+  if(anchEdges){
+  const pairAgg=new Map();
   links.forEach(l=>{const s=nodeOf(l.source),t=nodeOf(l.target); if(!s||!t)return;
-    const col=edgeColor(l.type);
     if(s.fac && t.fac && s.fac!==t.fac && cent[s.fac] && cent[t.fac]){
-      const A=cent[s.fac],B=cent[t.fac];
-      const gA=gate(A,B,s,facRad[s.fac]), gB=gate(B,A,t,facRad[t.fac]);   // fanned gateways
-      eg.appendChild(svel('path',{d:catmull([{x:s.x,y:s.y},gA,gB,{x:t.x,y:t.y}]),
-        fill:'none',stroke:col,'stroke-width':1.1,opacity:.42}));
-    } else eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:col,'stroke-width':1.3,opacity:.5}));});
+      const k=s.fac<t.fac?s.fac+'|'+t.fac:t.fac+'|'+s.fac;
+      const a=pairAgg.get(k)||{item:0,mention:0}; a[l.type==='mention'?'mention':'item']++; pairAgg.set(k,a);
+    } else eg.appendChild(svel('line',{x1:s.x,y1:s.y,x2:t.x,y2:t.y,stroke:edgeColor(l.type),'stroke-width':1,opacity:.32}));});
+  for(const [k,a] of pairAgg){const [fa,fb]=k.split('|').map(Number),A=cent[fa],B=cent[fb]; if(!A||!B)continue;
+    const cnt=a.item+a.mention, col=a.mention>a.item?'#c98bdb':'#7ee0a0';
+    const gA=gate(A,B,B,facRad[fa]), gB=gate(B,A,A,facRad[fb]);
+    const mx=(gA.x+gB.x)/2,my=(gA.y+gB.y)/2,dx=gB.x-gA.x,dy=gB.y-gA.y,L=Math.hypot(dx,dy)||1;
+    let nx=-dy/L, ny=dx/L;                              // bow outward into a peripheral corridor
+    if((mx-d.W/2)*nx+(my-d.H/2)*ny<0){nx=-nx;ny=-ny;}
+    const bow=Math.min(70,L*0.24), bx=mx+nx*bow, by=my+ny*bow;
+    eg.appendChild(svel('path',{d:`M ${gA.x.toFixed(1)},${gA.y.toFixed(1)} Q ${bx.toFixed(1)},${by.toFixed(1)} ${gB.x.toFixed(1)},${gB.y.toFixed(1)}`,
+      fill:'none',stroke:col,'stroke-width':Math.min(7,0.8+Math.sqrt(cnt)*1.0),opacity:.5,'stroke-linecap':'round'}));}
+  }  // if(anchEdges)
+  const deg=anchState.deg||[];
   d.nodes.forEach((nd,i)=>{
-    const n=nodes[i], g=svel('g',{class:'egonode'});
+    const n=nodes[i], g=svel('g',{class:'egonode'}), iso=(deg[i]||0)===0 && !nd.quest;  // orphan = dim
+    if(iso) g.style.opacity=.4;
     g.appendChild(svel('title',{})).textContent=`${nd.label}${nd.quest?' ⚔':''}`;
     if(nd.quest) g.appendChild(svel('rect',{x:n.x-4,y:n.y-4,width:8,height:8,fill:'#f2b705',stroke:'#1b1200','stroke-width':.7}));
-    else g.appendChild(svel('circle',{cx:n.x,cy:n.y,r:4,fill:facColor(nd.fac),stroke:'#0b0e13','stroke-width':.8}));
+    else g.appendChild(svel('circle',{cx:n.x,cy:n.y,r:iso?2.5:4,fill:facColor(nd.fac),stroke:'#0b0e13','stroke-width':.8}));
     g.onclick=()=>centerOn('npc:'+nd.id);
     ng.appendChild(g);
   });

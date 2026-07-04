@@ -1,17 +1,23 @@
 {
-  "description": "Phase 5 vision-critic loop: each round a Sonnet vision agent scored a render of the anchored layout against readability criteria (Purchase/Ware/Huang/Gestalt), then concrete fixes were applied and the graph re-rendered. Screenshots: critic_r{1,2,3}_{full,zoom}.png.",
+  "description": "Phase 5 vision-critic loop. Each round a Sonnet vision agent scored a render of the anchored layout against readability criteria (Purchase/Ware/Huang/Gestalt), then concrete fixes were applied and the graph re-rendered. Screenshots: critic_r{1..6}_{full,zoom}.png, clean_edges_off.png. The critic is genuinely strict — it never rubber-stamped and plateaued the layout at ~6/10.",
+  "overall_trajectory": [4, 5, 5, 5, 6, 5],
   "rounds": [
-    {"round": 1, "scores": {"crossings": 3, "edge_geometry": 3, "cluster_separation": 5, "label_legibility": 5, "whitespace": 4, "overall": 4},
-     "applied_next": ["route cross-faction edges through PERIMETER gateways (not the centroid) to break the starburst",
-                      "increase cola group padding 9->20 so faction blobs stop overlapping",
-                      "stop truncating faction labels; add label breathing room"]},
-    {"round": 2, "scores": {"crossings": 4, "edge_geometry": 5, "cluster_separation": 5, "label_legibility": 6, "whitespace": 5, "overall": 5},
-     "applied_next": ["fan each edge's gateway by its source position so terminations spread across the blob perimeter arc",
-                      "raise hull fill/stroke visibility so faint blobs (e.g. Steel Warriors) read"]},
-    {"round": 3, "scores": {"crossings": 5, "edge_geometry": 5, "cluster_separation": 7, "label_legibility": 6, "whitespace": 5, "overall": 5},
-     "verdict": "reads as a more deliberate, hand-tuned figure; residual convergence at Ebon Strongbear is a genuine high-degree hub in the data, not a layout artifact (diminishing returns).",
-     "remaining_inherent": ["hub convergence (one NPC is a shared-item hub for many)",
-                            "whitespace imbalance driven by faithful spawn geography (dense guild district vs sparse edges)",
-                            "long cross-canvas links need obstacle-avoiding routing (future work)"]}
-  ]
+    {"round": 1, "overall": 4, "scores": {"crossings":3,"edge_geometry":3,"cluster_separation":5,"label_legibility":5,"whitespace":4},
+     "applied_next": ["route cross-faction edges via perimeter gateways (break starburst)","cola group padding 9->20 (blob overlap)","stop truncating faction labels + add gaps"]},
+    {"round": 2, "overall": 5, "scores": {"crossings":4,"edge_geometry":5,"cluster_separation":5,"label_legibility":6,"whitespace":5},
+     "applied_next": ["fan each edge's gateway by source position","raise hull visibility"]},
+    {"round": 3, "overall": 5, "scores": {"crossings":5,"edge_geometry":5,"cluster_separation":7,"label_legibility":6,"whitespace":5},
+     "note": "convergence at Ebon Strongbear identified as a genuine high-degree hub, not a layout bug",
+     "applied_next": ["AGGREGATE cross-faction NPC-NPC edges into one ribbon per faction pair (kill the hairball)"]},
+    {"round": 4, "overall": 5, "scores": {"crossings":6,"edge_geometry":5,"cluster_separation":5,"label_legibility":7,"whitespace":5},
+     "applied_next": ["bow ribbons outward into peripheral corridors","dim disconnected orphan nodes","cola padding 20->26"]},
+    {"round": 5, "overall": 6, "scores": {"crossings":6,"edge_geometry":5,"cluster_separation":7,"label_legibility":6,"whitespace":5},
+     "note": "BEST version. Aggregation + outward corridors removed the hairball.",
+     "applied_next": ["obstacle-avoidance: push ribbon control points away from intervening blobs"]},
+    {"round": 6, "overall": 5, "scores": {"crossings":5,"edge_geometry":5,"cluster_separation":6,"label_legibility":4,"whitespace":6},
+     "note": "REGRESSION — obstacle avoidance traded blob-slicing for ribbon-on-ribbon crossings + labels cut by ribbons. A Pareto trade, not a win. Reverted to round-5 routing."},
+    {"round": "clean (edges off)", "overall": 6, "scores": {"cluster_separation":6,"label_legibility":6,"whitespace":5},
+     "note": "Even with NO edges, plateaus at 6 — the limiter is density imbalance inherent to the faithful spawn geography (dense guild district vs empty outskirts)."}
+  ],
+  "conclusion": "The loop works and is honestly critical. Aggregation was the real win (hairball -> ~6/10). Past that it plateaus: (1) obstacle-avoidance is a Pareto trade (fixes slicing, adds crossings) — the paper's multi-objective tension, live; (2) the remaining ceiling is whitespace/density imbalance that is INHERENT to anchoring on real spawn geography (faithfulness vs readability). Reaching 7-8 would require abandoning strict geography (dial the lambda slider toward 'emergent'), density-equalizing distortion (cartogram), or research-grade learned/joint layout. The critic correctly diagnosed this rather than chasing an unfixable artifact."
 }
