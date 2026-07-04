@@ -1,0 +1,182 @@
+{
+ "type_counts": {
+  "NPC": 736,
+  "Zone": 82,
+  "Faction": 123,
+  "Item": 2073,
+  "Spell": 396,
+  "Recipe": 1110
+ },
+ "pred_counts": {
+  "spawns in": 547,
+  "lowers standing with": 1151,
+  "is a member of": 344,
+  "raises standing with": 234,
+  "sells": 1173,
+  "drops": 465,
+  "casts": 5711,
+  "connects to": 15,
+  "yields (foraging)": 36,
+  "yields (fishing)": 1,
+  "is an ingredient in": 1284,
+  "produces": 1609,
+  "is opposed to": 124,
+  "is allied with": 137,
+  "has dialog mentioning": 2631
+ },
+ "pred_schema": [
+  {
+   "s": "NPC",
+   "p": "spawns in",
+   "o": "Zone",
+   "pt": "spawns_in",
+   "count": 547
+  },
+  {
+   "s": "NPC",
+   "p": "is a member of",
+   "o": "Faction",
+   "pt": "member_of",
+   "count": 344
+  },
+  {
+   "s": "NPC",
+   "p": "raises standing with",
+   "o": "Faction",
+   "pt": "raises",
+   "count": 234
+  },
+  {
+   "s": "NPC",
+   "p": "lowers standing with",
+   "o": "Faction",
+   "pt": "lowers",
+   "count": 1151
+  },
+  {
+   "s": "NPC",
+   "p": "drops",
+   "o": "Item",
+   "pt": "drops",
+   "count": 465
+  },
+  {
+   "s": "NPC",
+   "p": "sells",
+   "o": "Item",
+   "pt": "sells",
+   "count": 1173
+  },
+  {
+   "s": "NPC",
+   "p": "casts",
+   "o": "Spell",
+   "pt": "casts",
+   "count": 5711
+  },
+  {
+   "s": "Zone",
+   "p": "connects to",
+   "o": "Zone",
+   "pt": "connects_to",
+   "count": 15
+  },
+  {
+   "s": "Zone",
+   "p": "yields (forage/fishing)",
+   "o": "Item",
+   "pt": "forage",
+   "count": 0
+  },
+  {
+   "s": "Item",
+   "p": "is an ingredient in",
+   "o": "Recipe",
+   "pt": "ingredient_in",
+   "count": 1284
+  },
+  {
+   "s": "Recipe",
+   "p": "produces",
+   "o": "Item",
+   "pt": "produces",
+   "count": 1609
+  },
+  {
+   "s": "Faction",
+   "p": "is allied with",
+   "o": "Faction",
+   "pt": "allied",
+   "count": 137
+  },
+  {
+   "s": "Faction",
+   "p": "is opposed to",
+   "o": "Faction",
+   "pt": "opposed",
+   "count": 124
+  },
+  {
+   "s": "NPC",
+   "p": "has dialog mentioning",
+   "o": "NPC",
+   "pt": "mentions",
+   "count": 2631
+  }
+ ],
+ "n_nodes": 4520,
+ "n_triples": 15462,
+ "featured": [
+  {
+   "id": "npc:3049",
+   "label": "Te`Anara",
+   "type": "NPC"
+  },
+  {
+   "id": "npc:3022",
+   "label": "Corun Finisc",
+   "type": "NPC"
+  },
+  {
+   "id": "npc:3034",
+   "label": "Gerael Woodone",
+   "type": "NPC"
+  },
+  {
+   "id": "npc:3005",
+   "label": "Ran Walker",
+   "type": "NPC"
+  },
+  {
+   "id": "npc:3016",
+   "label": "Lerian Wyndrunner",
+   "type": "NPC"
+  },
+  {
+   "id": "npc:45066",
+   "label": "Kurne Rextula",
+   "type": "NPC"
+  },
+  {
+   "id": "fac:262",
+   "label": "Guards of Qeynos",
+   "type": "Faction"
+  },
+  {
+   "id": "fac:223",
+   "label": "Circle of Unseen Hands",
+   "type": "Faction"
+  },
+  {
+   "id": "fac:219",
+   "label": "Antonius Bayle",
+   "type": "Faction"
+  },
+  {
+   "id": "fac:221",
+   "label": "Bloodsabers",
+   "type": "Faction"
+  }
+ ],
+ "default_center": "fac:262"
+}

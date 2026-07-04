@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qeynos Quest-Connectivity — EQ Graph Analysis</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='13' font-size='13'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2330; --line:#2a3340;
+    --ink:#e6edf3; --mut:#9aa7b4; --dim:#6b7785;
+    --accent:#5ec8f2; --qeynos:#f2b705; --good:#3fb950; --warn:#e0823d;
+    --grid:#222b36;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+  header h1{font-size:26px;margin:0 0 4px;letter-spacing:-.4px}
+  header .sub{color:var(--mut);font-size:15px;max-width:760px}
+  .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;
+    background:var(--panel2);color:var(--mut);border:1px solid var(--line);margin-right:6px}
+  .paperlink{display:inline-block;margin-top:14px;font-size:14px;color:var(--ink);text-decoration:none;
+    background:linear-gradient(90deg,rgba(94,200,242,.12),rgba(242,183,5,.10));
+    border:1px solid var(--line);border-radius:10px;padding:9px 15px}
+  .paperlink:hover{border-color:var(--accent)}
+  .paperlink b{color:var(--accent)}
+  section{margin-top:34px}
+  h2{font-size:19px;margin:0 0 6px;letter-spacing:-.2px}
+  h2 .n{color:var(--dim);font-weight:600;margin-right:8px}
+  .lede{color:var(--mut);max-width:840px;margin:0 0 16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  /* verdict */
+  .verdict{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  .verdict .big{font-size:15px}
+  .badge{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;
+    background:rgba(63,185,80,.12);color:var(--good);border:1px solid rgba(63,185,80,.4);
+    padding:6px 12px;border-radius:8px;margin-bottom:12px}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .v{font-size:26px;font-weight:700;line-height:1.1}
+  .kpi .v.q{color:var(--qeynos)}
+  .kpi .k{color:var(--mut);font-size:12.5px;margin-top:3px}
+  /* bars */
+  .bars{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+  .bar{display:grid;grid-template-columns:150px 1fr 62px;align-items:center;gap:10px}
+  .bar .lab{font-size:13px;color:var(--ink);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .track{background:var(--panel2);border-radius:5px;height:22px;position:relative;overflow:hidden}
+  .bar .fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#2b6f8f,#5ec8f2)}
+  .bar.q .fill{background:linear-gradient(90deg,#8a6a06,#f2b705)}
+  .bar .fill .fl{position:absolute;right:6px;top:0;line-height:22px;font-size:11px;color:#cfe;opacity:.0}
+  .bar .val{font-size:12.5px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
+  .bar .nfac{font-size:11px;color:var(--dim)}
+  /* graph */
+  .gcontrols{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px}
+  .btn:hover{border-color:var(--accent)}
+  .btn.on{background:var(--accent);color:#04212e;border-color:var(--accent);font-weight:700}
+  .gwrap{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0b0e13}
+  canvas{display:block;width:100%;height:560px;touch-action:none;cursor:grab}
+  canvas.drag{cursor:grabbing}
+  .zoomctl{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px;z-index:4}
+  .zoomctl button{width:38px;height:38px;font-size:19px;line-height:1;border-radius:9px;
+    background:#0b0e13cc;border:1px solid var(--line);color:var(--ink);cursor:pointer;
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center}
+  .zoomctl button:active{background:var(--accent);color:#04212e}
+  .zoomctl button.rst{font-size:15px}
+  .ghint{position:absolute;left:10px;top:9px;font-size:11.5px;color:var(--dim);pointer-events:none;z-index:4}
+  .tip{position:absolute;pointer-events:none;background:#0b0e13ee;border:1px solid var(--line);
+    border-radius:8px;padding:8px 10px;font-size:12.5px;max-width:250px;opacity:0;transition:opacity .08s;z-index:5}
+  .tip b{color:var(--qeynos)}
+  .glegend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;color:var(--mut);font-size:12.5px;align-items:center}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .gstat{color:var(--dim);font-size:12.5px;margin-left:auto}
+  /* ontology */
+  .typelegend{display:flex;flex-wrap:wrap;gap:12px;margin:2px 0 4px;font-size:12.5px;color:var(--mut)}
+  .schemawrap{overflow-x:auto}
+  .ontctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 8px}
+  .ontctl input{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:7px 11px;border-radius:8px;font-size:13px;min-width:230px}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:20px;
+    padding:4px 11px;font-size:12.5px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  .tfilter{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
+  .tfilter label{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);
+    background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 8px;cursor:pointer;user-select:none}
+  .tfilter label.off{opacity:.4;text-decoration:line-through}
+  .crumb{color:var(--mut);font-size:12.5px;margin:2px 0 8px}
+  .crumb b{color:var(--qeynos)}
+  .ontwrap{border:1px solid var(--line);border-radius:10px;background:#0b0e13;overflow:hidden}
+  #ego{display:block;width:100%;height:600px;touch-action:none}
+  #ego text{font:11px -apple-system,Segoe UI,sans-serif;pointer-events:none}
+  #ego .nlabel{fill:var(--ink)}
+  #ego .plabel{fill:var(--mut);font-size:10px;font-style:italic}
+  #ego .center-h{font-weight:700}
+  .egonode{cursor:pointer}
+  .triples{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 0;max-height:340px;overflow:auto}
+  .trow{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
+    padding:6px 14px;font-size:13px;border-bottom:1px solid #1a2029}
+  .trow:last-child{border-bottom:0}
+  .trow .s{text-align:right}.trow .o{text-align:left}
+  .trow .ent{cursor:pointer;color:var(--ink)}.trow .ent:hover{color:var(--accent);text-decoration:underline}
+  .trow .self{color:var(--qeynos);font-weight:600;cursor:default}
+  .trow .pred{color:var(--dim);font-style:italic;white-space:nowrap;font-size:11.5px}
+  .trow .arrow{color:var(--dim)}
+  .tt{display:inline-block;font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;
+    padding:1px 5px;border-radius:4px;margin-right:5px;vertical-align:middle;color:#0b0e13;font-weight:700}
+  /* zone figure */
+  .zctl{display:flex;gap:7px;align-items:center;margin:4px 0 8px;flex-wrap:wrap}
+  .zctl .btn{padding:5px 11px}
+  .zscroll{position:relative;height:76vh;max-height:860px;min-height:480px;overflow:auto;
+    border:1px solid var(--line);border-radius:10px;background:#0a0d12}
+  #zonefig{display:block;height:auto}
+  #zonefig text{font-family:-apple-system,Segoe UI,sans-serif}
+  #zonefig .hdr{fill:#8595a4;font-weight:800;letter-spacing:1.5px;font-size:15px}
+  #zonefig .flabel{font-weight:700;font-size:15px}
+  #zonefig .nl{fill:#c3cedb;font-size:11px}
+  #zonefig .il{fill:#9fd7ac;font-size:10.5px}
+  #zonefig .zl{fill:#bfe4f5;font-weight:700;font-size:12px}
+  #zonefig .egonode{cursor:pointer}
+  #zonefig .egonode:hover .nl,#zonefig .egonode:hover .il{fill:#fff}
+  .zolegend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:10px 2px 2px;color:var(--mut);font-size:12.5px;align-items:center}
+  .zolegend .swatch{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .zolegend .sq{border-radius:2px}
+  .zstats{color:var(--dim);font-size:12.5px;margin-top:8px}
+  .zstats b{color:var(--ink)}
+  /* table */
+  .tctl{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .tctl input{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:6px 10px;border-radius:8px;font-size:13px}
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{padding:7px 10px;text-align:right;white-space:nowrap}
+  th:nth-child(2),td:nth-child(2),th:nth-child(1),td:nth-child(1){text-align:left}
+  thead th{position:sticky;top:0;background:var(--panel2);cursor:pointer;user-select:none;
+    border-bottom:1px solid var(--line);color:var(--mut);font-weight:600}
+  thead th:hover{color:var(--ink)}
+  thead th.sort{color:var(--accent)}
+  tbody tr:nth-child(even){background:#12171f}
+  tbody tr.q{background:rgba(242,183,5,.10)}
+  tbody tr.q td:nth-child(2){color:var(--qeynos);font-weight:600}
+  td.rank{color:var(--dim);font-variant-numeric:tabular-nums}
+  .meth{color:var(--mut);font-size:13.5px}
+  .meth code{background:var(--panel2);padding:1px 6px;border-radius:5px;color:#cfe;font-size:12.5px}
+  .meth li{margin:6px 0}
+  .foot{color:var(--dim);font-size:12px;margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:760px){.verdict{grid-template-columns:1fr}.bar{grid-template-columns:110px 1fr 52px}
+    canvas{height:66vh;min-height:380px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><span class="tag">EQMac / Alkabor 2024-03-01</span><span class="tag">graph theory</span><span class="tag">173 zones · 15,144 NPCs · 2,117 factions</span></div>
+  <h1>Does Qeynos really have the densest quest connectivity?</h1>
+  <p class="sub">Reconstructing a per-zone <b>content-connectivity graph</b> from the EverQuest world database — NPCs linked by shared factions and shared quest items — to test a friend's claim with actual graph metrics.</p>
+  <a class="paperlink" href="paper.html">📄 Research paper — <b>Making Machine-Drawn Ontologies Look Hand-Drawn</b> · lit review &amp; proposal <span aria-hidden="true">→</span></a>
+</header>
+
+<section id="verdict">
+  <h2><span class="n">Verdict</span>Mostly yes — as a <i>city</i>, and if you value <i>diversity</i> of connections</h2>
+  <div class="verdict">
+    <div class="panel big">
+      <div class="badge">✔ Hypothesis supported (with nuance)</div>
+      <p>Treating <b>“the city of Qeynos”</b> as its natural cluster (South + North + Aqueducts), Qeynos ranks <b>#1</b> of every city in EQ for quest-web richness — a blend of quest-giver count, how densely those quest-givers interlink, and <b>faction diversity</b>. It roughly <b>doubles</b> its nearest rival, Freeport.</p>
+      <p>The nuance: no single Qeynos zone tops any single metric. <b>Shadow Haven</b> has more quest NPCs but only <b>6 factions</b> (a neutral Luclin bazaar); <b>Thurgadin</b> is denser but a one-faction dwarf hold; dragon dungeons like <b>Skyshrine</b> win naive graph density by being a single monolithic clique. Qeynos wins precisely because it is <b>broad and varied</b> — 67 distinct factions woven through 160 quest-givers.</p>
+      <p class="meth" style="margin-bottom:0">So your friend is right on the strongest reading, but “densest” depends on the definition: Qeynos loses raw density, and wins richness &amp; diversity.</p>
+    </div>
+    <div class="panel">
+      <div class="kpis">
+        <div class="kpi"><div class="v q">#1</div><div class="k">Qeynos city — quest-web richness rank (of 19 city clusters)</div></div>
+        <div class="kpi"><div class="v q">67</div><div class="k">distinct factions in Qeynos city — vs Shadow Haven’s 6</div></div>
+        <div class="kpi"><div class="v">160</div><div class="k">quest-giver NPCs across Qeynos city zones</div></div>
+        <div class="kpi"><div class="v">1.8×</div><div class="k">Qeynos city score vs #3 Freeport</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cities">
+  <h2><span class="n">1</span>City-cluster leaderboard</h2>
+  <p class="lede">The fair unit for “a city” is its combined zones. Bars show the <b>quest-web richness score</b> = quest-givers × (1 + quest-giver avg degree) × √(faction diversity). Number at right of each label is <b>distinct factions</b>.</p>
+  <div class="panel"><div class="bars" id="cityBars"></div></div>
+</section>
+
+<section id="graph">
+  <h2><span class="n">2</span>The connectivity graph, up close</h2>
+  <p class="lede">Every dot is an NPC; every line a shared faction or shared rare item. Colour = community (auto-detected clusters of tightly related NPCs). Squares are flagged <b>quest-givers</b>. Compare Qeynos’ many small guild/merchant/citizen communities against Shadow Haven’s big undifferentiated blob.</p>
+  <div class="gcontrols" id="gButtons"></div>
+  <div class="gwrap">
+    <canvas id="cv"></canvas>
+    <div class="ghint" id="ghint">pinch or scroll to zoom · drag to pan</div>
+    <div class="zoomctl">
+      <button id="zin" title="zoom in" aria-label="zoom in">+</button>
+      <button id="zout" title="zoom out" aria-label="zoom out">−</button>
+      <button id="zrst" class="rst" title="reset view" aria-label="reset view">⤢</button>
+    </div>
+    <div class="tip" id="tip"></div>
+  </div>
+  <div class="glegend">
+    <span><span class="dot" style="background:#f2b705"></span>■ quest-giver NPC</span>
+    <span><span class="dot" style="background:#5ec8f2"></span>● regular NPC (colour = community)</span>
+    <span>line = shared faction / rare item · brighter = stronger tie</span>
+    <span class="gstat" id="gStat"></span>
+  </div>
+</section>
+
+<section id="ontology">
+  <h2><span class="n">3</span>Ontology view — the Qeynos knowledge graph</h2>
+  <p class="lede">The graphs above are <i>undirected co-membership</i> (“these two NPCs share a faction”). Here it’s a proper <b>ontology</b>: a <b>directed, typed</b> graph where every edge is an <b>action phrase</b> — <code style="font-size:12px">subject —predicate→ object</code> triples. Six entity types and fifteen relations — including <b>derived</b> faction alliances inferred from how NPCs co-adjust standings, and <b>has dialog mentioning</b>, extracted by reading all ~293 Qeynos NPCs' quest-script dialogue with an LLM (catching references by name <em>and</em> by epithet/role, e.g. “the governor” → Antonius Bayle) and linking each to a canonical entity.</p>
+
+  <h3 style="margin:24px 0 4px;font-size:16px">A. Zone ontology map — one zone, laid out on purpose</h3>
+  <p class="lede" style="margin-bottom:8px">A deliberate left-to-right layout: <b>neighbouring zones → factions → NPCs → items</b>. NPCs sit in <b>faction swim-lanes</b>; each item is placed beside the NPCs that provide it. Solid green items are <b>distinctive to this zone</b>; faint ones are found across Norrath. Click any node to open it in the explorer below.</p>
+  <div class="zctl" id="zoneBtns"></div>
+  <div class="zctl">
+    <button class="btn" id="zzout">−</button><button class="btn" id="zzin">zoom +</button>
+    <span class="zstats" id="zstats"></span>
+  </div>
+  <div class="zscroll"><svg id="zonefig"></svg></div>
+  <div class="zolegend">
+    <span><span class="swatch sq" style="background:#f2b705"></span>quest-giver NPC</span>
+    <span><span class="swatch" style="background:#7fb2e8"></span>NPC</span>
+    <span><span class="swatch" style="background:#b07cf0"></span>faction</span>
+    <span><span class="swatch" style="background:#3fb950"></span>item unique to zone</span>
+    <span><span class="swatch" style="background:#26502f;border:1px dashed #3fb950"></span>item shared across Norrath</span>
+    <span><span class="swatch sq" style="background:#5ec8f2"></span>neighbouring zone (exit)</span>
+    <span><span class="swatch" style="background:#f0a35e"></span>cross-faction item link (shared between lanes)</span>
+  </div>
+
+  <h3 style="margin:30px 0 4px;font-size:16px">B. The ontology schema &amp; entity explorer</h3>
+  <div class="panel">
+    <div style="font-size:13px;color:var(--mut);margin-bottom:8px">Schema (the ontology itself) — arrows are relations, numbers are triple counts in the Qeynos universe:</div>
+    <div class="schemawrap"><svg id="schema" viewBox="0 0 900 360" style="width:100%;min-width:640px;height:auto"></svg></div>
+    <div class="typelegend" id="typeLegend"></div>
+  </div>
+
+  <div class="ontctl">
+    <input id="ontSearch" list="ontList" placeholder="search any entity… (NPC, faction, item, spell)">
+    <datalist id="ontList"></datalist>
+    <span style="color:var(--dim);font-size:12.5px">or jump to:</span>
+    <span id="ontChips"></span>
+  </div>
+  <div class="tfilter" id="tFilter"></div>
+  <div class="crumb" id="ontCrumb"></div>
+  <div class="ontwrap"><svg id="ego"></svg></div>
+  <div class="triples" id="triples"></div>
+</section>
+
+<section id="zones">
+  <h2><span class="n">4</span>All 173 zones — full leaderboard</h2>
+  <p class="lede">Click any header to sort. Qeynos-area zones highlighted. Notice how the “best” zone changes completely with the metric — that’s the whole point.</p>
+  <div class="tctl">
+    <input id="filter" placeholder="filter zones… (e.g. qey, freeport, kunark)" size="34">
+    <span class="meth" id="tcount"></span>
+  </div>
+  <div class="scroll"><table id="ztab"><thead></thead><tbody></tbody></table></div>
+</section>
+
+<section id="method">
+  <h2><span class="n">5</span>How this was built</h2>
+  <div class="panel meth">
+    <p>EQ “quests” are Perl scripts kept in a separate repo — they aren’t in the database. But the <i>ontology quests run on</i> is: which NPCs belong to which factions, and which items pass between them. So this reconstructs each zone as a graph:</p>
+    <ul>
+      <li><b>Nodes</b> — every distinct NPC that spawns in the zone (via <code>spawn2 → spawnentry → npc_types</code>).</li>
+      <li><b>Faction ties</b> — two NPCs are linked if they share a faction in their faction hit-list (<code>npc_faction_entries</code>), weighted by <code>1 / faction size</code> so sharing a tight allegiance (real relationship) counts far more than sharing a universal one.</li>
+      <li><b>Item ties</b> — two NPCs linked if they share an item (loot or merchant) held by ≤ 40 NPCs globally, weighted by <code>1 / item frequency</code>. This drops commodities (diamonds, spell runes, fine-steel) and keeps quest-relevant items.</li>
+      <li><b>Metrics</b> — density, weighted degree, clustering, connected components, greedy-modularity communities, plus a quest-giver-only subgraph (<code>npc_types.isquest</code>).</li>
+    </ul>
+    <p>Why rarity-weighting matters: without it, a dragon dungeon where 194 dragons all share one faction becomes a near-complete graph (density 0.94) and “wins”. That’s faction <i>monotony</i>, not quest richness. Weighting by rarity, and rewarding faction <i>diversity</i>, makes “dense connectivity” mean <i>tightly &amp; meaningfully interlinked</i>.</p>
+    <p style="margin-bottom:0">Caveats: NPC turn-in relationships that live only in quest scripts aren’t captured; “isquest” is the DB’s own flag and is imperfect; city clusters are hand-grouped. The ranking is robust to reasonable variations of these choices.</p>
+  </div>
+</section>
+
+<div class="foot">Local analysis server · data: Alkabor (EQMacEmu) full DB, 2024-03-01 · MySQL 5.7 + Python/networkx · served on :8787</div>
+</div>
+
+<script>
+const PAL = ["#5ec8f2","#f2b705","#3fb950","#e0823d","#b07cf0","#f26d6d","#4dd6c1","#e879b9",
+  "#9ccb3b","#6ea8fe","#f0a35e","#7ee0a0","#c98bdb","#f2c94c","#68c9d4","#d98cf0",
+  "#8fd35a","#ef8ba0","#5fb0e8","#e0b04d"];
+const communityColor = c => PAL[c % PAL.length];
+
+/* ---------- city bars ---------- */
+fetch('data/cluster_metrics.json').then(r=>r.json()).then(rows=>{
+  const max = Math.max(...rows.map(r=>r.quest_score));
+  const el = document.getElementById('cityBars');
+  rows.forEach(r=>{
+    const isQ = /Qeynos/.test(r.cluster);
+    const w = (100*r.quest_score/max).toFixed(1);
+    const d = document.createElement('div');
+    d.className = 'bar'+(isQ?' q':'');
+    d.innerHTML = `<div class="lab">${r.cluster} <span class="nfac">·${r.n_factions}f</span></div>
+      <div class="track"><div class="fill" style="width:${w}%"></div></div>
+      <div class="val">${(r.quest_score/1000).toFixed(0)}k</div>`;
+    el.appendChild(d);
+  });
+});
+
+/* ---------- network graph ---------- */
+const DATASETS = [
+  ['data/viz_qeynos.json','South Qeynos',true],
+  ['data/viz_qeynos_metro.json','Qeynos (whole city)',false],
+  ['data/viz_freportw.json','West Freeport',false],
+  ['data/viz_shadowhaven.json','Shadow Haven',false],
+  ['data/viz_rivervale.json','Rivervale',false],
+];
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const tip = document.getElementById('tip'), gStat = document.getElementById('gStat');
+const ghint = document.getElementById('ghint');
+let G=null, view=null, hover=-1;
+let zoom=1, panX=0, panY=0, rk=1;          // pan/zoom state + node-radius scale
+const ZMIN=0.35, ZMAX=9;
+const SX = n => n._lx*zoom + panX;          // layout -> screen
+const SY = n => n._ly*zoom + panY;
+
+function resize(){
+  const r = cv.getBoundingClientRect();
+  cv.width = Math.round(r.width*devicePixelRatio);
+  cv.height = Math.round(r.height*devicePixelRatio);
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  if(G) computeView();
+}
+function computeView(){                      // fit layout into canvas; reset zoom/pan
+  const r=cv.getBoundingClientRect(), W=r.width, H=r.height, pad=26;
+  const xs=G.nodes.map(n=>n.x), ys=G.nodes.map(n=>n.y);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const s=Math.min((W-2*pad)/((x1-x0)||1),(H-2*pad)/((y1-y0)||1));
+  const ox=(W-(x1-x0)*s)/2 - x0*s, oy=(H-(y1-y0)*s)/2 - y0*s;
+  view={W,H};
+  rk=Math.max(0.62, Math.min(1.05, Math.min(W,H)/560));   // shrink nodes on small canvases
+  G.nodes.forEach(n=>{n._lx=n.x*s+ox; n._ly=n.y*s+oy;});
+  zoom=1; panX=0; panY=0;
+  draw();
+}
+function nrad(n){ return (2.6 + Math.min(6.5, Math.sqrt(n.deg)/1.7))*rk; }
+function draw(fast){
+  if(!view) return;
+  const {W,H}=view; ctx.clearRect(0,0,W,H);
+  // screen coords
+  for(const n of G.nodes){ n._sx=SX(n); n._sy=SY(n); }
+  // edges
+  if(fast){                                  // batched, cheap pass during drag/pinch
+    ctx.globalAlpha=0.14; ctx.strokeStyle='#6a8299'; ctx.lineWidth=1; ctx.beginPath();
+    for(const e of G.edges){const a=G.idx[e.s],b=G.idx[e.t]; if(!a||!b)continue;
+      ctx.moveTo(a._sx,a._sy); ctx.lineTo(b._sx,b._sy);}
+    ctx.stroke();
+  } else {
+    ctx.lineWidth=1;
+    for(const e of G.edges){
+      const a=G.idx[e.s], b=G.idx[e.t]; if(!a||!b) continue;
+      if(hover>=0 && a.id!==hover && b.id!==hover){ ctx.globalAlpha=0.045; }
+      else { ctx.globalAlpha = 0.06 + 0.22*Math.min(1,e.w*3); }
+      ctx.strokeStyle = e.typ==='item' ? '#7ee0a0' : '#6a8299';
+      ctx.beginPath(); ctx.moveTo(a._sx,a._sy); ctx.lineTo(b._sx,b._sy); ctx.stroke();
+    }
+  }
+  ctx.globalAlpha=1;
+  // nodes
+  for(const n of G.nodes){
+    const r=nrad(n);
+    const dim = hover>=0 && n.id!==hover && !n._adj;
+    ctx.globalAlpha = dim?0.22:1;
+    ctx.fillStyle = n.quest ? '#f2b705' : communityColor(n.comm);
+    if(n.quest){
+      ctx.fillRect(n._sx-r, n._sy-r, r*2, r*2);
+      ctx.strokeStyle='#1b1200'; ctx.lineWidth=1; ctx.strokeRect(n._sx-r,n._sy-r,r*2,r*2);
+    } else {
+      ctx.beginPath(); ctx.arc(n._sx,n._sy,r,0,7); ctx.fill();
+    }
+    if(n.id===hover){ ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath();
+      ctx.arc(n._sx,n._sy,r+3,0,7); ctx.stroke(); }
+  }
+  ctx.globalAlpha=1;
+}
+function loadGraph(url){
+  fetch(url).then(r=>r.json()).then(d=>{
+    G={nodes:d.nodes,edges:d.edges,idx:{}};
+    d.nodes.forEach(n=>G.idx[n.id]=n);
+    G.adj={}; d.nodes.forEach(n=>G.adj[n.id]=new Set());
+    d.edges.forEach(e=>{G.adj[e.s]&&G.adj[e.s].add(e.t);G.adj[e.t]&&G.adj[e.t].add(e.s);});
+    hover=-1;
+    gStat.textContent = `${d.name}: ${d.nodes.length} NPCs · ${d.edges.length.toLocaleString()} ties · ${d.n_comm} communities`;
+    computeView();
+  });
+}
+// ---- zoom helpers ----
+function zoomAt(cx,cy,factor){
+  const nz=Math.max(ZMIN,Math.min(ZMAX,zoom*factor));
+  factor=nz/zoom;
+  panX = cx - (cx-panX)*factor;
+  panY = cy - (cy-panY)*factor;
+  zoom = nz;
+}
+function pick(mx,my){                          // nearest node within touch-friendly radius
+  let best=-1,bd=1e9;
+  for(const n of G.nodes){const dx=n._sx-mx,dy=n._sy-my,dd=dx*dx+dy*dy; if(dd<bd){bd=dd;best=n.id;}}
+  const lim=Math.max(16, 22*rk); return bd<=lim*lim?best:-1;
+}
+function setHover(id,mx,my){
+  if(id!==hover){ hover=id; const adj=id>=0?G.adj[id]:null;
+    G.nodes.forEach(n=>n._adj=adj?adj.has(n.id):false); draw(); }
+  if(id>=0){ const n=G.idx[id];
+    tip.style.opacity=1;
+    tip.style.left=Math.min(view.W-160,mx+14)+'px'; tip.style.top=(my+12)+'px';
+    tip.innerHTML=`<b>${n.name}</b>${n.quest?' ⚔':''}<br>${n.fac?('faction: '+n.fac+'<br>'):''}${n.deg} connections`;
+  } else tip.style.opacity=0;
+}
+function localXY(ev){ const r=cv.getBoundingClientRect(); return [ev.clientX-r.left, ev.clientY-r.top]; }
+
+// ---- mouse: hover / drag-pan / wheel-zoom ----
+let mdown=false, mmoved=false, lastX=0, lastY=0;
+cv.addEventListener('mousedown',ev=>{mdown=true;mmoved=false;[lastX,lastY]=localXY(ev);cv.classList.add('drag');});
+window.addEventListener('mouseup',()=>{mdown=false;cv.classList.remove('drag');});
+cv.addEventListener('mousemove',ev=>{
+  if(!G||!view) return; const [mx,my]=localXY(ev);
+  if(mdown){ mmoved=true; panX+=mx-lastX; panY+=my-lastY; lastX=mx; lastY=my;
+    if(hover>=0){hover=-1;G.nodes.forEach(n=>n._adj=false);tip.style.opacity=0;} draw(true); }
+  else setHover(pick(mx,my),mx,my);
+});
+cv.addEventListener('mouseup',ev=>{ if(!mmoved){const[mx,my]=localXY(ev);draw();setHover(pick(mx,my),mx,my);} else draw(); });
+cv.addEventListener('mouseleave',()=>{ if(!mdown) setHover(-1,0,0); });
+cv.addEventListener('wheel',ev=>{ if(!G)return; ev.preventDefault();
+  const [mx,my]=localXY(ev); zoomAt(mx,my, ev.deltaY<0?1.16:1/1.16); ghint.style.opacity=0; draw(); },{passive:false});
+
+// ---- touch: pinch-zoom / drag-pan / tap-inspect ----
+let touches=new Map(), pinchD=0, pinchMid=[0,0], tmoved=false;
+function tXY(t){ const r=cv.getBoundingClientRect(); return [t.clientX-r.left,t.clientY-r.top]; }
+cv.addEventListener('touchstart',ev=>{ if(!G)return; ev.preventDefault(); ghint.style.opacity=0;
+  for(const t of ev.changedTouches) touches.set(t.identifier,tXY(t));
+  tmoved=false;
+  if(touches.size===2){ const [a,b]=[...touches.values()];
+    pinchD=Math.hypot(a[0]-b[0],a[1]-b[1]); pinchMid=[(a[0]+b[0])/2,(a[1]+b[1])/2]; }
+  else if(touches.size===1){ const [p]=[...touches.values()]; lastX=p[0]; lastY=p[1]; }
+},{passive:false});
+cv.addEventListener('touchmove',ev=>{ if(!G)return; ev.preventDefault();
+  for(const t of ev.changedTouches) if(touches.has(t.identifier)) touches.set(t.identifier,tXY(t));
+  if(touches.size>=2){ const [a,b]=[...touches.values()];
+    const d=Math.hypot(a[0]-b[0],a[1]-b[1]), mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    if(pinchD>0) zoomAt(pinchMid[0],pinchMid[1], d/pinchD);
+    panX+=mid[0]-pinchMid[0]; panY+=mid[1]-pinchMid[1];
+    pinchD=d; pinchMid=mid; tmoved=true; draw(true);
+  } else if(touches.size===1){ const [p]=[...touches.values()];
+    panX+=p[0]-lastX; panY+=p[1]-lastY; lastX=p[0]; lastY=p[1]; tmoved=true; draw(true);
+  }
+},{passive:false});
+cv.addEventListener('touchend',ev=>{ if(!G)return;
+  const wasOne = touches.size===1;
+  for(const t of ev.changedTouches){ if(!tmoved && wasOne){ const [mx,my]=tXY(t);
+    draw(); const id=pick(mx,my); setHover(id,mx,my);} touches.delete(t.identifier); }
+  if(touches.size<2) pinchD=0;
+  if(tmoved && touches.size===0) draw();
+});
+
+document.getElementById('zin').onclick =()=>{if(G){zoomAt(view.W/2,view.H/2,1.35);draw();}};
+document.getElementById('zout').onclick=()=>{if(G){zoomAt(view.W/2,view.H/2,1/1.35);draw();}};
+document.getElementById('zrst').onclick=()=>{if(G){computeView();}};
+
+const gb=document.getElementById('gButtons');
+DATASETS.forEach(([url,label,def],i)=>{
+  const b=document.createElement('button'); b.className='btn'+(def?' on':''); b.textContent=label;
+  b.onclick=()=>{document.querySelectorAll('#gButtons .btn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); loadGraph(url);};
+  gb.appendChild(b);
+});
+window.addEventListener('resize',resize);
+
+/* ================= ONTOLOGY VIEW ================= */
+const TCOL={NPC:'#f2b705',Faction:'#b07cf0',Item:'#3fb950',Zone:'#5ec8f2',Spell:'#e0823d',Recipe:'#e879b9'};
+const PCOL={member_of:'#b07cf0',raises:'#3fb950',lowers:'#f26d6d',drops:'#4dd6c1',sells:'#f2b705',
+  casts:'#e0823d',spawns_in:'#5ec8f2',connects_to:'#5ec8f2',forage:'#3fb950',fishing:'#3fb950',
+  ingredient_in:'#e879b9',produces:'#e879b9',allied:'#3fb950',opposed:'#f26d6d',mentions:'#d98cf0'};
+const SVGNS='http://www.w3.org/2000/svg';
+const svel=(t,a)=>{const e=document.createElementNS(SVGNS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const short=(s,n)=>{s=s||'';return s.length>n?s.slice(0,n-1)+'…':s;};
+let ONT=null, OIDX=null, curCenter=null, hist=[];
+const typeOn={NPC:1,Faction:1,Item:1,Zone:1,Spell:1,Recipe:1};
+
+Promise.all([fetch('data/onto_graph.json').then(r=>r.json()),
+             fetch('data/onto_schema.json').then(r=>r.json())]).then(([g,sc])=>{
+  ONT={g,sc}; const byId={},out={},inc={};
+  g.nodes.forEach(n=>byId[n.id]=n);
+  g.triples.forEach(t=>{(out[t.s]=out[t.s]||[]).push(t);(inc[t.o]=inc[t.o]||[]).push(t);});
+  OIDX={byId,out,inc};
+  renderSchema(sc);
+  // type legend
+  document.getElementById('typeLegend').innerHTML=Object.keys(TCOL).map(t=>
+    `<span><span class="dot" style="background:${TCOL[t]}"></span>${t} · ${(sc.type_counts[t]||0).toLocaleString()}</span>`).join('');
+  // type filters
+  document.getElementById('tFilter').innerHTML=Object.keys(TCOL).map(t=>
+    `<label data-t="${t}"><span class="dot" style="background:${TCOL[t]}"></span>${t}</label>`).join('');
+  document.querySelectorAll('#tFilter label').forEach(l=>l.onclick=()=>{
+    const t=l.dataset.t; typeOn[t]=!typeOn[t]; l.classList.toggle('off',!typeOn[t]); renderEgo();});
+  // featured chips
+  document.getElementById('ontChips').innerHTML=sc.featured.map(f=>
+    `<span class="chip" data-id="${f.id}">${f.label}</span>`).join(' ');
+  document.querySelectorAll('#ontChips .chip').forEach(c=>c.onclick=()=>centerOn(c.dataset.id));
+  // search datalist
+  const dl=document.getElementById('ontList');
+  const opts=g.nodes.filter(n=>n.deg>0).sort((a,b)=>b.deg-a.deg).slice(0,1600);
+  dl.innerHTML=opts.map(n=>`<option value="${n.label.replace(/"/g,'')} — ${n.type}" data-id="${n.id}">`).join('');
+  const si=document.getElementById('ontSearch');
+  si.onchange=()=>{const m=[...dl.options].find(o=>o.value===si.value);
+    let id=m&&m.getAttribute('data-id');
+    if(!id){const q=si.value.toLowerCase().split(' — ')[0].trim();
+      const n=g.nodes.find(n=>n.label.toLowerCase()===q)||g.nodes.find(n=>n.label.toLowerCase().includes(q));
+      id=n&&n.id;}
+    if(id){centerOn(id);si.value='';}};
+  centerOn(sc.default_center);
+});
+zoneInit();
+
+function renderSchema(sc){
+  const svg=document.getElementById('schema'); svg.innerHTML='';
+  const P={NPC:[150,180],Faction:[430,64],Item:[710,150],Zone:[150,320],Spell:[420,330],Recipe:[770,320]};
+  // arrow marker
+  const defs=svel('defs',{});
+  const mk=svel('marker',{id:'ah',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'});
+  mk.appendChild(svel('path',{d:'M0,0 L10,5 L0,10 z',fill:'#8aa'})); defs.appendChild(mk); svg.appendChild(defs);
+  // group parallel edges
+  const pairs={};
+  sc.pred_schema.filter(p=>p.count>0).forEach(p=>{(pairs[p.s+'>'+p.o]=pairs[p.s+'>'+p.o]||[]).push(p);});
+  const shrink=(a,b,m)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;return [a[0]+dx/L*m,a[1]+dy/L*m];};
+  Object.values(pairs).forEach(list=>list.forEach((p,i)=>{
+    const a0=P[p.s],b0=P[p.o];
+    if(p.s===p.o){ // self loop
+      const [x,y]=a0, off=28+i*20;
+      const path=svel('path',{d:`M${x-16},${y-14} C ${x-16-off},${y-off} ${x+16+off},${y-off} ${x+16},${y-14}`,
+        fill:'none',stroke:PCOL[p.pt]||'#8aa','stroke-width':1.6,'marker-end':'url(#ah)',opacity:.8});
+      svg.appendChild(path);
+      const lb=svel('text',{x:x,y:y-off-4,'text-anchor':'middle',fill:PCOL[p.pt],'font-size':10,'font-style':'italic'});
+      lb.textContent=`${p.p} (${p.count})`; svg.appendChild(lb); return;
+    }
+    const a=shrink(a0,b0,52), b=shrink(b0,a0,52);
+    const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2, dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;
+    const base=(p.s<p.o?1:-1)*24;   // separate reciprocal A->B / B->A edges
+    const k=base+(i-(list.length-1)/2)*34, cxp=mx-dy/L*k, cyp=my+dx/L*k;
+    svg.appendChild(svel('path',{d:`M${a[0]},${a[1]} Q ${cxp},${cyp} ${b[0]},${b[1]}`,fill:'none',
+      stroke:PCOL[p.pt]||'#8aa','stroke-width':1.6,'marker-end':'url(#ah)',opacity:.85}));
+    const lx=cxp*0.5+mx*0.5, ly=cyp*0.5+my*0.5;
+    const lb=svel('text',{x:lx,y:ly-2,'text-anchor':'middle',fill:PCOL[p.pt],'font-size':10.5,'font-style':'italic'});
+    lb.textContent=`${p.p} (${p.count})`; svg.appendChild(lb);
+  }));
+  // type boxes on top
+  for(const t in P){const [x,y]=P[t];
+    svg.appendChild(svel('rect',{x:x-52,y:y-18,width:104,height:36,rx:9,fill:'#161b22',stroke:TCOL[t],'stroke-width':2}));
+    const tx=svel('text',{x:x,y:y+4,'text-anchor':'middle',fill:TCOL[t],'font-size':14,'font-weight':700});
+    tx.textContent=t; svg.appendChild(tx);}
+}
+
+/* ================= ZONE ONTOLOGY MAP ================= */
+let zzoom=1, zcur=null, zData={};
+function zoneInit(){
+  fetch('data/zoneonto_manifest.json').then(r=>r.json()).then(man=>{
+    const bt=document.getElementById('zoneBtns');
+    bt.innerHTML=man.map((m,i)=>`<button class="btn${i===0?' on':''}" data-z="${m.zone}">${m.long}</button>`).join('');
+    bt.querySelectorAll('.btn').forEach(b=>b.onclick=()=>{
+      bt.querySelectorAll('.btn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+      loadZone(b.dataset.z);});
+    document.getElementById('zzin').onclick=()=>{zzoom=Math.min(3.2,zzoom+0.3);applyZ();};
+    document.getElementById('zzout').onclick=()=>{zzoom=Math.max(0.7,zzoom-0.3);applyZ();};
+    loadZone(man[0].zone);
+  });
+}
+function applyZ(){const s=document.getElementById('zonefig'); if(s)s.style.width=(zzoom*100)+'%';}
+function loadZone(z){
+  if(zData[z]) return renderZoneFig(zData[z]);
+  fetch(`data/zoneonto_${z}.json`).then(r=>r.json()).then(d=>{zData[z]=d;renderZoneFig(d);});
+}
+function renderZoneFig(d){
+  zcur=d.zone;
+  const svg=document.getElementById('zonefig'); svg.innerHTML='';
+  const VW=1620, H=d.height, C=d.cols;
+  svg.setAttribute('viewBox',`0 0 ${VW} ${H}`); svg.style.width=(zzoom*100)+'%';
+  const defs=svel('defs',{});
+  const m=svel('marker',{id:'zah',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'});
+  m.appendChild(svel('path',{d:'M0,0 L10,5 L0,10 z',fill:'#5ec8f2'})); defs.appendChild(m); svg.appendChild(defs);
+  // position map
+  const pos={}; d.nodes.forEach(n=>pos[n.id]=n); pos['ZONEHDR']={x:C.XZONE,y:d.zone_anchor_y};
+  // faction lane bands
+  const bg=svel('g',{}); svg.appendChild(bg);
+  d.bands.forEach((b,i)=>{
+    bg.appendChild(svel('rect',{x:360,y:b.y0,width:1240,height:Math.max(0,b.y1-b.y0),
+      fill:i%2?'#0e131a':'#11171f',opacity:.9}));
+  });
+  const eg=svel('g',{}); svg.appendChild(eg);       // edges
+  const ng=svel('g',{}); svg.appendChild(ng);       // nodes
+  // partition so cross-lane links draw on top and pop
+  const within=[], cross=[], special=[];
+  d.edges.forEach(e=>{
+    if(e.pt==='connects_to'||e.pt==='allied'||e.pt==='opposed') special.push(e);
+    else if(e.pt!=='member_of' && e.xlane) cross.push(e);
+    else within.push(e);
+  });
+  const seg=(a,b,attrs)=>{eg.appendChild(svel('line',Object.assign({x1:a.x,y1:a.y,x2:b.x,y2:b.y},attrs)));};
+  within.forEach(e=>{const a=pos[e.s],b=pos[e.t]; if(!a||!b)return;
+    const col=PCOL[e.pt]||'#6a8299';
+    seg(a,b,{stroke:col,'stroke-width':1,opacity:e.pt==='member_of'?0.13:0.22});});
+  cross.forEach(e=>{const a=pos[e.s],b=pos[e.t]; if(!a||!b)return;   // cross-faction item flow
+    const cxp=Math.max(a.x,b.x)+90, cyp=(a.y+b.y)/2;               // bow toward item column
+    eg.appendChild(svel('path',{d:`M${a.x},${a.y} Q ${cxp},${cyp} ${b.x},${b.y}`,fill:'none',
+      stroke:'#f0a35e','stroke-width':1.1,opacity:.5}));});
+  special.forEach(e=>{const a=pos[e.s],b=pos[e.t]; if(!a||!b)return;
+    if(e.pt==='connects_to'){ seg(a,b,{stroke:PCOL[e.pt],'stroke-width':2,opacity:.8,'marker-end':'url(#zah)'}); }
+    else{ const cx=C.XFAC-80, my=(a.y+b.y)/2;
+      eg.appendChild(svel('path',{d:`M${a.x-6},${a.y} Q ${cx},${my} ${b.x-6},${b.y}`,fill:'none',
+        stroke:PCOL[e.pt],'stroke-width':1.3,opacity:.4})); }});
+  // helper node
+  const mkNode=(n,shape)=>{const g=svel('g',{class:'egonode'});g.appendChild(svel('title',{})).textContent=
+    `${n.label}  ·  ${n.type}${n.zc?`  ·  in ${n.zc} zone${n.zc>1?'s':''}`:''}`;
+    g.onclick=()=>centerOn(n.id); ng.appendChild(g); return g;};
+  // items
+  d.nodes.filter(n=>n.type==='Item').forEach(n=>{
+    const g=mkNode(n);
+    if(n.external){ g.appendChild(svel('circle',{cx:n.x,cy:n.y,r:3,fill:'#16301c',stroke:'#3fb950','stroke-width':1,'stroke-dasharray':'2 1.5',opacity:.75}));}
+    else { g.appendChild(svel('circle',{cx:n.x,cy:n.y,r:3.4,fill:'#3fb950'})); }
+    const t=svel('text',{x:n.x+8,y:n.y+3.5,class:'il','text-anchor':'start'}); t.textContent=short(n.label,26);
+    if(n.external)t.setAttribute('opacity',.6); g.appendChild(t);
+  });
+  // NPCs
+  d.nodes.filter(n=>n.type==='NPC').forEach(n=>{
+    const g=mkNode(n);
+    if(n.quest){ g.appendChild(svel('rect',{x:n.x-4,y:n.y-4,width:8,height:8,fill:'#f2b705',stroke:'#1b1200','stroke-width':.7})); }
+    else { g.appendChild(svel('circle',{cx:n.x,cy:n.y,r:3.4,fill:'#7fb2e8'})); }
+    const t=svel('text',{x:n.x+9,y:n.y+3.5,class:'nl','text-anchor':'start'}); t.textContent=short(n.label,26); g.appendChild(t);
+  });
+  // Factions
+  d.nodes.filter(n=>n.type==='Faction').forEach(n=>{
+    const g=mkNode(n); const r=8+Math.min(9,Math.sqrt(n.deg));
+    g.appendChild(svel('circle',{cx:n.x,cy:n.y,r,fill:'#2a1f3a',stroke:'#b07cf0','stroke-width':2}));
+    const t=svel('text',{x:n.x-r-8,y:n.y+5,class:'flabel','text-anchor':'end',fill:'#c9aef2'});
+    t.textContent=short(n.label,22); g.appendChild(t);
+    g.appendChild(svel('text',{x:n.x,y:n.y+4,'text-anchor':'middle','font-size':10,fill:'#e6d8ff','font-weight':700})).textContent=n.deg;
+  });
+  // Zones
+  d.nodes.filter(n=>n.type==='Zone').forEach(n=>{
+    const g=mkNode(n); const w=Math.min(200,28+short(n.label,22).length*7);
+    g.appendChild(svel('rect',{x:n.x-8,y:n.y-12,width:w,height:24,rx:6,fill:'#0d2430',stroke:'#5ec8f2','stroke-width':1.5}));
+    g.appendChild(svel('text',{x:n.x,y:n.y+4,class:'zl','text-anchor':'start'})).textContent=short(n.label,22);
+  });
+  // THIS ZONE anchor + headers
+  const hz=svel('g',{}); svg.appendChild(hz);
+  hz.appendChild(svel('rect',{x:C.XZONE-8,y:d.zone_anchor_y-13,width:150,height:26,rx:6,fill:'#132a1a',stroke:'#3fb950','stroke-width':1.5}));
+  hz.appendChild(svel('text',{x:C.XZONE,y:d.zone_anchor_y+4,'text-anchor':'start','font-size':12,'font-weight':800,fill:'#8ee6a2'})).textContent='◆ '+short(d.long,18);
+  [['NEIGHBOURS',C.XZONE+60],['FACTIONS',C.XFAC],['NPCs',C.XNPC],['ITEMS',C.XITEM+60]].forEach(([lab,x])=>{
+    hz.appendChild(svel('text',{x,y:24,'text-anchor':'middle',class:'hdr'})).textContent=lab;
+  });
+  hz.appendChild(svel('line',{x1:40,y1:34,x2:VW-20,y2:34,stroke:'#222b36','stroke-width':1}));
+  const s=d.stats;
+  document.getElementById('zstats').innerHTML=
+    `<b>${s.npcs}</b> NPCs (<b>${s.quest_npcs}</b> quest-givers) in <b>${s.factions}</b> faction lanes · `+
+    `<b>${s.items}</b> distinct items (${s.items-s.ext_items} unique to zone) · <b>${s.neighbors}</b> zone exits`;
+}
+
+/* ---- ego explorer ---- */
+let egoZ=1,egoX=0,egoY=0;
+function applyEgoT(){document.getElementById('egoRoot')?.setAttribute('transform',
+  `translate(${egoX},${egoY}) scale(${egoZ})`);}
+function centerOn(id){
+  if(!OIDX||!OIDX.byId[id])return;
+  if(curCenter&&curCenter!==id){hist.push(curCenter);if(hist.length>30)hist.shift();}
+  curCenter=id; egoZ=1;egoX=0;egoY=0;
+  renderCrumb(); renderEgo(); renderTriples();
+  document.getElementById('ontology').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderCrumb(){
+  const n=OIDX.byId[curCenter];
+  const back=hist.length?`<span class="chip" id="ontBack">← back</span> `:'';
+  document.getElementById('ontCrumb').innerHTML=
+    `${back}centered on <b>${n.label}</b> <span class="tt" style="background:${TCOL[n.type]}">${n.type}</span> · ${n.deg} relations`;
+  const b=document.getElementById('ontBack'); if(b)b.onclick=()=>{const p=hist.pop();if(p){curCenter=null;centerOn(p);}};
+}
+function neighbors(id){
+  const out=(OIDX.out[id]||[]).map(t=>({t,dir:'out',other:t.o,pt:t.pt,p:t.p}));
+  const inc=(OIDX.inc[id]||[]).map(t=>({t,dir:'in',other:t.s,pt:t.pt,p:t.p}));
+  return out.concat(inc).filter(x=>typeOn[OIDX.byId[x.other]?.type]);
+}
+function renderEgo(){
+  const svg=document.getElementById('ego'); svg.innerHTML='';
+  svg.setAttribute('viewBox','0 0 800 600');
+  const defs=svel('defs',{});
+  ['#8aa',...new Set(Object.values(PCOL))].forEach((c,i)=>{
+    const m=svel('marker',{id:'m'+i,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'});
+    m.appendChild(svel('path',{d:'M0,0 L10,5 L0,10 z',fill:c})); defs.appendChild(m);});
+  const mkId=c=>{const arr=['#8aa',...new Set(Object.values(PCOL))];return 'm'+Math.max(0,arr.indexOf(c));};
+  svg.appendChild(defs);
+  const root=svel('g',{id:'egoRoot'}); svg.appendChild(root);
+  const cx=400,cy=300, C=OIDX.byId[curCenter];
+  // group neighbors by (dir,pt), cap each
+  let nb=neighbors(curCenter);
+  const groups={};
+  nb.forEach(x=>{const k=x.dir+'|'+x.pt;(groups[k]=groups[k]||[]).push(x);});
+  const CAP=9;
+  let flat=[]; const gmeta=[];
+  Object.entries(groups).forEach(([k,arr])=>{
+    const shown=arr.slice(0,CAP);
+    gmeta.push({k,dir:shown[0].dir,pt:shown[0].pt,p:shown[0].p,extra:arr.length-shown.length,size:shown.length});
+    shown.forEach(x=>flat.push(x));
+  });
+  const total=Math.max(flat.length,1);
+  const R= total<=18?220 : total<=30?255 : 285;
+  // draw edges + nodes
+  let idx=0; const gstart={};
+  gmeta.forEach(g=>{gstart[g.k]=idx; idx+=g.size;});
+  flat.forEach((x,i)=>{
+    const ang=-Math.PI/2 + ((i+0.5)/total)*2*Math.PI;
+    const cos=Math.cos(ang), sin=Math.sin(ang);
+    const rr=R + (i%2)*32;                        // zig-zag ring to declutter labels
+    const nx=cx+cos*rr, ny=cy+sin*rr;
+    const col=PCOL[x.pt]||'#8aa';
+    const from = x.dir==='out'?[cx,cy]:[nx,ny];
+    const to   = x.dir==='out'?[nx,ny]:[cx,cy];
+    root.appendChild(svel('line',{x1:from[0],y1:from[1],x2:to[0],y2:to[1],
+      stroke:col,'stroke-width':1.4,opacity:.5,'marker-end':'url(#'+mkId(col)+')'}));
+    const on=OIDX.byId[x.other];
+    const g=svel('g',{class:'egonode'}); g.style.cursor='pointer';
+    g.appendChild(svel('circle',{cx:nx,cy:ny,r:on.type==='NPC'?6.5:5.5,fill:TCOL[on.type],stroke:'#0b0e13','stroke-width':1}));
+    let anchor,lxo,lyo=4;                          // 3-way anchoring incl. top/bottom
+    if(cos>0.35){anchor='start';lxo=10;}
+    else if(cos<-0.35){anchor='end';lxo=-10;}
+    else{anchor='middle';lxo=0;lyo=sin<0?-10:15;}
+    const tl=svel('text',{x:nx+lxo,y:ny+lyo,'text-anchor':anchor,class:'nlabel'});
+    tl.textContent=short(on.label,17); g.appendChild(tl);
+    g.onclick=()=>centerOn(x.other);
+    root.appendChild(g);
+  });
+  // predicate labels per group (at mid-angle)
+  gmeta.forEach(g=>{
+    const s=gstart[g.k], mid=s+(g.size-1)/2;
+    const ang=-Math.PI/2 + ((mid+0.5)/total)*2*Math.PI, lr=R*0.52;
+    const lx=cx+Math.cos(ang)*lr, ly=cy+Math.sin(ang)*lr;
+    const arrow=g.dir==='out'?'→':'←';
+    const tl=svel('text',{x:lx,y:ly,'text-anchor':'middle',class:'plabel',fill:PCOL[g.pt]||'#8aa'});
+    tl.textContent=(g.dir==='out'?arrow+' ':'')+g.p+(g.dir==='in'?' '+arrow:'')+(g.extra?` (+${g.extra})`:'');
+    root.appendChild(tl);
+  });
+  // center node
+  root.appendChild(svel('circle',{cx,cy,r:13,fill:TCOL[C.type],stroke:'#fff','stroke-width':2}));
+  const ct=svel('text',{x:cx,y:cy-20,'text-anchor':'middle',class:'nlabel center-h','font-size':14});
+  ct.textContent=short(C.label,32); root.appendChild(ct);
+  const cty=svel('text',{x:cx,y:cy+30,'text-anchor':'middle',class:'plabel'});
+  cty.textContent=C.type; root.appendChild(cty);
+  applyEgoT(); wireEgoZoom(svg);
+}
+function renderTriples(){
+  const box=document.getElementById('triples');
+  const C=OIDX.byId[curCenter];
+  const out=(OIDX.out[curCenter]||[]).filter(t=>typeOn[OIDX.byId[t.o]?.type]);
+  const inc=(OIDX.inc[curCenter]||[]).filter(t=>typeOn[OIDX.byId[t.s]?.type]);
+  const cap=(arr)=>arr.slice(0,120);
+  const ent=(id,self)=>{const n=OIDX.byId[id];
+    return self?`<span class="self"><span class="tt" style="background:${TCOL[n.type]}">${n.type}</span>${n.label}</span>`
+      :`<span class="ent" data-id="${id}"><span class="tt" style="background:${TCOL[n.type]}">${n.type}</span>${n.label}</span>`;};
+  const rows=[];
+  cap(out).forEach(t=>rows.push(`<div class="trow"><div class="s">${ent(t.s,true)}</div><div class="pred">${t.p} <span class="arrow">→</span></div><div class="o">${ent(t.o)}</div></div>`));
+  cap(inc).forEach(t=>rows.push(`<div class="trow"><div class="s">${ent(t.s)}</div><div class="pred"><span class="arrow">→</span> ${t.p}</div><div class="o">${ent(t.o,true)}</div></div>`));
+  box.innerHTML=rows.join('')||'<div class="trow"><div></div><div class="pred">no relations for current filters</div><div></div></div>';
+  box.querySelectorAll('.ent').forEach(e=>e.onclick=()=>centerOn(e.dataset.id));
+}
+/* ego pan/zoom (wheel + drag + pinch) */
+let egoWired=false;
+function wireEgoZoom(svg){
+  if(egoWired)return; egoWired=true;
+  const pt=ev=>{const r=svg.getBoundingClientRect();const sx=800/r.width,sy=600/r.height;
+    return [(ev.clientX-r.left)*sx,(ev.clientY-r.top)*sy];};
+  let drag=false,lx=0,ly=0;
+  svg.addEventListener('wheel',ev=>{ev.preventDefault();const [mx,my]=pt(ev);
+    const f=ev.deltaY<0?1.15:1/1.15,nz=Math.max(.4,Math.min(6,egoZ*f));const k=nz/egoZ;
+    egoX=mx-(mx-egoX)*k;egoY=my-(my-egoY)*k;egoZ=nz;applyEgoT();},{passive:false});
+  svg.addEventListener('mousedown',ev=>{drag=true;[lx,ly]=pt(ev);});
+  window.addEventListener('mouseup',()=>drag=false);
+  svg.addEventListener('mousemove',ev=>{if(!drag)return;const[mx,my]=pt(ev);egoX+=mx-lx;egoY+=my-ly;lx=mx;ly=my;applyEgoT();});
+  let ts=new Map(),pd=0,pm=[0,0];
+  svg.addEventListener('touchstart',ev=>{ev.preventDefault();for(const t of ev.changedTouches)ts.set(t.identifier,pt(t));
+    if(ts.size===2){const[a,b]=[...ts.values()];pd=Math.hypot(a[0]-b[0],a[1]-b[1]);pm=[(a[0]+b[0])/2,(a[1]+b[1])/2];}
+    else if(ts.size===1){const[p]=[...ts.values()];lx=p[0];ly=p[1];}},{passive:false});
+  svg.addEventListener('touchmove',ev=>{ev.preventDefault();for(const t of ev.changedTouches)if(ts.has(t.identifier))ts.set(t.identifier,pt(t));
+    if(ts.size>=2){const[a,b]=[...ts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]),m=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      if(pd>0){const k=Math.max(.4,Math.min(6,egoZ*d/pd))/egoZ;egoX=pm[0]-(pm[0]-egoX)*k;egoY=pm[1]-(pm[1]-egoY)*k;egoZ*=k;}
+      egoX+=m[0]-pm[0];egoY+=m[1]-pm[1];pd=d;pm=m;applyEgoT();}
+    else if(ts.size===1){const[p]=[...ts.values()];egoX+=p[0]-lx;egoY+=p[1]-ly;lx=p[0];ly=p[1];applyEgoT();}},{passive:false});
+  svg.addEventListener('touchend',ev=>{for(const t of ev.changedTouches)ts.delete(t.identifier);if(ts.size<2)pd=0;});
+}
+
+/* ---------- zone table ---------- */
+const COLS=[
+  ['rank','#',0],['long','zone',0],['zone','short',0],
+  ['N','NPCs',0],['quest_npcs','questNPC',0],['n_factions','factions',0],
+  ['q_avgdeg','q·deg',2],['q_density','q·dens',3],
+  ['density','density',3],['clustering','clust',2],
+  ['avg_wdeg','w·deg',2],['quest_score','richness',0]];
+const QEY=new Set(['qeynos','qeynos2','qcat','qeytoqrg','qrg']);
+let ZDATA=[], sortKey='quest_score', sortDir=-1;
+fetch('data/zone_metrics.json').then(r=>r.json()).then(rows=>{
+  ZDATA=rows; renderHead(); sortAndRender();
+});
+function renderHead(){
+  const tr=document.createElement('tr');
+  COLS.forEach(([k,lab])=>{const th=document.createElement('th');th.textContent=lab;
+    th.onclick=()=>{if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='long'||k==='zone')?1:-1;}sortAndRender();};
+    if(k===sortKey)th.classList.add('sort'); th.dataset.k=k; tr.appendChild(th);});
+  const th=document.querySelector('#ztab thead'); th.innerHTML=''; th.appendChild(tr);
+}
+function sortAndRender(){
+  const f=document.getElementById('filter').value.toLowerCase();
+  let rows=ZDATA.filter(r=>!f||r.zone.toLowerCase().includes(f)||(r.long||'').toLowerCase().includes(f));
+  rows.sort((a,b)=>{const x=a[sortKey],y=b[sortKey];
+    if(typeof x==='string')return sortDir*x.localeCompare(y);return sortDir*((x||0)-(y||0));});
+  const tb=document.querySelector('#ztab tbody'); tb.innerHTML='';
+  rows.forEach((r,i)=>{
+    const tr=document.createElement('tr'); if(QEY.has(r.zone))tr.className='q';
+    COLS.forEach(([k,lab,dec])=>{const td=document.createElement('td');
+      if(k==='rank'){td.textContent=i+1;td.className='rank';}
+      else if(k==='long'){td.textContent=r.long||r.zone;}
+      else {let v=r[k]; td.textContent=(typeof v==='number')?(dec?v.toFixed(dec):Math.round(v).toLocaleString()):v;}
+      tr.appendChild(td);});
+    tb.appendChild(tr);
+  });
+  document.querySelectorAll('#ztab thead th').forEach(th=>th.classList.toggle('sort',th.dataset.k===sortKey));
+  document.getElementById('tcount').textContent=`${rows.length} zones shown · sorted by ${sortKey} ${sortDir<0?'↓':'↑'}`;
+}
+document.getElementById('filter').addEventListener('input',sortAndRender);
+
+/* init */
+resize(); loadGraph(DATASETS[0][0]);
+</script>
+</body>
+</html>

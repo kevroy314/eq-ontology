@@ -1,0 +1,2204 @@
+[
+  {
+    "speaker_id": 2087,
+    "speaker": "Togahn Sorast",
+    "mentions": [
+      {
+        "referent": "Brother Phin",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Phin gives those headbands out",
+        "confidence": "high"
+      },
+      {
+        "referent": "Silent Fist Clan",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Silent Fist Clan gives out colored Headbands",
+        "confidence": "high"
+      },
+      {
+        "referent": "Brother Dareb",
+        "type": "npc",
+        "how": "name",
+        "evidence": "brother Dareb was last heard from",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plains of South Karana",
+        "type": "place",
+        "how": "name",
+        "evidence": "out in the Plains of South Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Splitpaw",
+        "type": "faction",
+        "how": "name",
+        "evidence": "gnolls fleeing Splitpaw may have captured him",
+        "confidence": "high"
+      },
+      {
+        "referent": "Brother Shen",
+        "type": "npc",
+        "how": "name",
+        "evidence": "sent brother Shen to go search",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ghanex Drah",
+        "type": "npc",
+        "how": "name",
+        "evidence": "ruler of the now fleeing gnolls of Splitpaw",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonica",
+        "type": "place",
+        "how": "name",
+        "evidence": "good people of Antonica must put an end",
+        "confidence": "high"
+      },
+      {
+        "referent": "Skull of Jhen'Tra",
+        "type": "item",
+        "how": "name",
+        "evidence": "I don't know much about the Skull of Jhen'Tra",
+        "confidence": "high"
+      },
+      {
+        "referent": "Lake Rathetear",
+        "type": "place",
+        "how": "name",
+        "evidence": "gnoll burial grounds of Lake Rathetear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Dagger of Marnek",
+        "type": "item",
+        "how": "name",
+        "evidence": "The Dagger of Marnek is a diabolical weapon",
+        "confidence": "high"
+      },
+      {
+        "referent": "Marnek Jaull",
+        "type": "npc",
+        "how": "name",
+        "evidence": "ancient necromancer Marnek Jaull",
+        "confidence": "high"
+      },
+      {
+        "referent": "Solusek Ro",
+        "type": "npc",
+        "how": "name",
+        "evidence": "worshipped Solusek Ro",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "paladins from Erudin, followers of Prexus",
+        "confidence": "high"
+      },
+      {
+        "referent": "Prexus",
+        "type": "npc",
+        "how": "name",
+        "evidence": "followers of Prexus",
+        "confidence": "high"
+      },
+      {
+        "referent": "Befallen",
+        "type": "place",
+        "how": "name",
+        "evidence": "control the depths of Befallen",
+        "confidence": "high"
+      },
+      {
+        "referent": "Coronet of Buried Blood",
+        "type": "item",
+        "how": "name",
+        "evidence": "The Coronet of Buried Blood is an ancient headdress",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plexant Temple",
+        "type": "place",
+        "how": "name",
+        "evidence": "belonged to the High Priest of the Plexant Temple",
+        "confidence": "high"
+      },
+      {
+        "referent": "Innoruuk",
+        "type": "npc",
+        "how": "name",
+        "evidence": "devout followers of Innoruuk",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1067,
+    "speaker": "Daedet Losaren",
+    "mentions": [
+      {
+        "referent": "Temple of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "the Temple of Thunder has recognized",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "enemy of the Knights of Thunder",
+        "confidence": "high"
+      },
+      {
+        "referent": "Karana",
+        "type": "npc",
+        "how": "name",
+        "evidence": "an enemy of Karana himself",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hills",
+        "type": "place",
+        "how": "name",
+        "evidence": "into Qeynos and Qeynos Hills",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kerra Isle",
+        "type": "place",
+        "how": "name",
+        "evidence": "Kerra Isle beetles",
+        "confidence": "med"
+      },
+      {
+        "referent": "Kerra Ridge",
+        "type": "place",
+        "how": "name",
+        "evidence": "found in Kerra Ridge",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonica",
+        "type": "place",
+        "how": "name",
+        "evidence": "the island between Antonica and Odus",
+        "confidence": "high"
+      },
+      {
+        "referent": "Odus",
+        "type": "place",
+        "how": "name",
+        "evidence": "between Antonica and Odus",
+        "confidence": "high"
+      },
+      {
+        "referent": "Bertoxxulous",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Bertoxxulous, the Plaguebringer, is the Lord of Disease",
+        "confidence": "high"
+      },
+      {
+        "referent": "Bloodsabers",
+        "type": "faction",
+        "how": "name",
+        "evidence": "called the Bloodsabers",
+        "confidence": "high"
+      },
+      {
+        "referent": "Chesgard Sydwend",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Speak more of this matter with Chesgard Sydwend",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sir Drosco",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Have you knowledge of Sir Drosco",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sir Wolten",
+        "type": "npc",
+        "how": "name",
+        "evidence": "reports to Sir Wolten",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "speak with the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "Temple of Life on the other side of Qeynos",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1091,
+    "speaker": "Guard Corshin",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "craftsmanship of the Ironforges",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "found near the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Order of Three",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Order of Three consists",
+        "confidence": "high"
+      },
+      {
+        "referent": "Silent Fist Clan",
+        "type": "faction",
+        "how": "name",
+        "evidence": "house of the Silent Fist Clan",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "training the Qeynos Guard in hand",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hold",
+        "type": "place",
+        "how": "name",
+        "evidence": "Qeynos Hold in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "catch the ship to Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Commander Kane Bayle is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "second only to his brother, Antonius Bayle",
+        "confidence": "high"
+      },
+      {
+        "referent": "Circle of the Unseen Hand",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Circle of the Unseen Hand? I have heard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Within Qeynos are the Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Hall of Thunder",
+        "type": "place",
+        "how": "name",
+        "evidence": "Hall of Thunder lies in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Protectors of the Pine",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Protectors of the Pine and Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "druids called the Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Surefall Glade",
+        "type": "place",
+        "how": "name",
+        "evidence": "hollow of Surefall Glade",
+        "confidence": "high"
+      },
+      {
+        "referent": "Captain Linarius Graffe",
+        "type": "npc",
+        "how": "name",
+        "evidence": "commanded by Captain Linarius Graffe",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plains of Karana",
+        "type": "place",
+        "how": "name",
+        "evidence": "northern Plains of Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Clock of Ak'Anon",
+        "type": "place",
+        "how": "name",
+        "evidence": "next to the Clock of Ak'Anon",
+        "confidence": "med"
+      },
+      {
+        "referent": "Lion's Mane Inn and Tavern",
+        "type": "place",
+        "how": "name",
+        "evidence": "recommend the Lion's Mane Inn and Tavern",
+        "confidence": "high"
+      },
+      {
+        "referent": "Fish's",
+        "type": "place",
+        "how": "name",
+        "evidence": "backrooms of Fish's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Captain Tillin Brightblade",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Captain Tillin Brightblade is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ebon Strongbear",
+        "type": "npc",
+        "how": "name",
+        "evidence": "discussing tactics with Ebon Strongbear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sabertooths",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Extermination of the Sabertooths",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow",
+        "type": "place",
+        "how": "name",
+        "evidence": "Sabertooths of Blackburrow",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow Stout",
+        "type": "item",
+        "how": "name",
+        "evidence": "sell the outland Blackburrow Stout",
+        "confidence": "high"
+      },
+      {
+        "referent": "Firepride's",
+        "type": "place",
+        "how": "name",
+        "evidence": "bridge behind Firepride's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Qeynos Tower Guards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Qeynos Tower Guards of the hills and plains",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "role",
+        "evidence": "Commander Bayle refuses to send regular patrols",
+        "confidence": "high"
+      },
+      {
+        "referent": "Trumpy",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Trumpy? Shhh! Don't mention his name",
+        "confidence": "med"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1307,
+    "speaker": "Guard Oleph",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "craftsmanship of the Ironforges",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "found near the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Order of Three",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Order of Three consists",
+        "confidence": "high"
+      },
+      {
+        "referent": "Silent Fist Clan",
+        "type": "faction",
+        "how": "name",
+        "evidence": "house of the Silent Fist Clan",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "training the Qeynos Guard in hand",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hold",
+        "type": "place",
+        "how": "name",
+        "evidence": "Qeynos Hold in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "catch the ship to Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Commander Kane Bayle is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "second only to his brother, Antonius Bayle",
+        "confidence": "high"
+      },
+      {
+        "referent": "Circle of the Unseen Hand",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Circle of the Unseen Hand? I have heard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Within Qeynos are the Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Hall of Thunder",
+        "type": "place",
+        "how": "name",
+        "evidence": "Hall of Thunder lies in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Protectors of the Pine",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Protectors of the Pine and Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "druids called the Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Surefall Glade",
+        "type": "place",
+        "how": "name",
+        "evidence": "hollow of Surefall Glade",
+        "confidence": "high"
+      },
+      {
+        "referent": "Captain Linarius Graffe",
+        "type": "npc",
+        "how": "name",
+        "evidence": "commanded by Captain Linarius Graffe",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plains of Karana",
+        "type": "place",
+        "how": "name",
+        "evidence": "northern Plains of Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Clock of Ak'Anon",
+        "type": "place",
+        "how": "name",
+        "evidence": "next to the Clock of Ak'Anon",
+        "confidence": "med"
+      },
+      {
+        "referent": "Lion's Mane Inn and Tavern",
+        "type": "place",
+        "how": "name",
+        "evidence": "recommend the Lion's Mane Inn and Tavern",
+        "confidence": "high"
+      },
+      {
+        "referent": "Fish's",
+        "type": "place",
+        "how": "name",
+        "evidence": "backrooms of Fish's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Captain Tillin Brightblade",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Captain Tillin Brightblade is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ebon Strongbear",
+        "type": "npc",
+        "how": "name",
+        "evidence": "discussing tactics with Ebon Strongbear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sabertooths",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Extermination of the Sabertooths",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow",
+        "type": "place",
+        "how": "name",
+        "evidence": "Sabertooths of Blackburrow",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow Stout",
+        "type": "item",
+        "how": "name",
+        "evidence": "sell the outland Blackburrow Stout",
+        "confidence": "high"
+      },
+      {
+        "referent": "Firepride's",
+        "type": "place",
+        "how": "name",
+        "evidence": "bridge behind Firepride's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Qeynos Tower Guards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Qeynos Tower Guards of the hills and plains",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "role",
+        "evidence": "If Commander Bayle were running things here",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1069,
+    "speaker": "Dionna",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "craftsmanship of the Ironforges",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "found near the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Order of Three",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Order of Three consists",
+        "confidence": "high"
+      },
+      {
+        "referent": "Silent Fist Clan",
+        "type": "faction",
+        "how": "name",
+        "evidence": "house of the Silent Fist Clan",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "training the Qeynos Guard in hand",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hold",
+        "type": "place",
+        "how": "name",
+        "evidence": "Qeynos Hold in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "catch the ship to Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Commander Kane Bayle is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "second only to his brother, Antonius Bayle",
+        "confidence": "high"
+      },
+      {
+        "referent": "Circle of the Unseen Hand",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Circle of the Unseen Hand? I have heard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Within Qeynos are the Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Hall of Thunder",
+        "type": "place",
+        "how": "name",
+        "evidence": "Hall of Thunder lies in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Protectors of the Pine",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Protectors of the Pine and Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "druids called the Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Surefall Glade",
+        "type": "place",
+        "how": "name",
+        "evidence": "hollow of Surefall Glade",
+        "confidence": "high"
+      },
+      {
+        "referent": "Captain Linarius Graffe",
+        "type": "npc",
+        "how": "name",
+        "evidence": "commanded by Captain Linarius Graffe",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plains of Karana",
+        "type": "place",
+        "how": "name",
+        "evidence": "northern Plains of Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Clock of Ak'Anon",
+        "type": "place",
+        "how": "name",
+        "evidence": "next to the Clock of Ak'Anon",
+        "confidence": "med"
+      },
+      {
+        "referent": "Lion's Mane Inn and Tavern",
+        "type": "place",
+        "how": "name",
+        "evidence": "recommend the Lion's Mane Inn and Tavern",
+        "confidence": "high"
+      },
+      {
+        "referent": "Fish's",
+        "type": "place",
+        "how": "name",
+        "evidence": "backrooms of Fish's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Captain Tillin Brightblade",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Captain Tillin Brightblade is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ebon Strongbear",
+        "type": "npc",
+        "how": "name",
+        "evidence": "discussing tactics with Ebon Strongbear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sabertooths",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Extermination of the Sabertooths",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow",
+        "type": "place",
+        "how": "name",
+        "evidence": "Sabertooths of Blackburrow",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow Stout",
+        "type": "item",
+        "how": "name",
+        "evidence": "sell the outland Blackburrow Stout",
+        "confidence": "high"
+      },
+      {
+        "referent": "Firepride's",
+        "type": "place",
+        "how": "name",
+        "evidence": "bridge behind Firepride's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Qeynos Tower Guards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Qeynos Tower Guards of the hills and plains",
+        "confidence": "high"
+      },
+      {
+        "referent": "Fabian",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Fabian said to give you this",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1200,
+    "speaker": "Guard Urius",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "craftsmanship of the Ironforges",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "found near the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Order of Three",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Order of Three consists",
+        "confidence": "high"
+      },
+      {
+        "referent": "Silent Fist Clan",
+        "type": "faction",
+        "how": "name",
+        "evidence": "house of the Silent Fist Clan",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "training the Qeynos Guard in hand",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hold",
+        "type": "place",
+        "how": "name",
+        "evidence": "Qeynos Hold in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "catch the ship to Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Commander Kane Bayle is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "second only to his brother, Antonius Bayle",
+        "confidence": "high"
+      },
+      {
+        "referent": "Circle of the Unseen Hand",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Circle of the Unseen Hand? I have heard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Within Qeynos are the Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Hall of Thunder",
+        "type": "place",
+        "how": "name",
+        "evidence": "Hall of Thunder lies in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Protectors of the Pine",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Protectors of the Pine and Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "druids called the Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Surefall Glade",
+        "type": "place",
+        "how": "name",
+        "evidence": "hollow of Surefall Glade",
+        "confidence": "high"
+      },
+      {
+        "referent": "Captain Linarius Graffe",
+        "type": "npc",
+        "how": "name",
+        "evidence": "commanded by Captain Linarius Graffe",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plains of Karana",
+        "type": "place",
+        "how": "name",
+        "evidence": "northern Plains of Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Clock of Ak'Anon",
+        "type": "place",
+        "how": "name",
+        "evidence": "next to the Clock of Ak'Anon",
+        "confidence": "med"
+      },
+      {
+        "referent": "Lion's Mane Inn and Tavern",
+        "type": "place",
+        "how": "name",
+        "evidence": "recommend the Lion's Mane Inn and Tavern",
+        "confidence": "high"
+      },
+      {
+        "referent": "Fish's",
+        "type": "place",
+        "how": "name",
+        "evidence": "backrooms of Fish's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Captain Tillin Brightblade",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Captain Tillin Brightblade is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ebon Strongbear",
+        "type": "npc",
+        "how": "name",
+        "evidence": "discussing tactics with Ebon Strongbear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sabertooths",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Extermination of the Sabertooths",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow",
+        "type": "place",
+        "how": "name",
+        "evidence": "Sabertooths of Blackburrow",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow Stout",
+        "type": "item",
+        "how": "name",
+        "evidence": "sell the outland Blackburrow Stout",
+        "confidence": "high"
+      },
+      {
+        "referent": "Firepride's",
+        "type": "place",
+        "how": "name",
+        "evidence": "bridge behind Firepride's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Qeynos Tower Guards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Qeynos Tower Guards of the hills and plains",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1084,
+    "speaker": "Lylanthian",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "craftsmanship of the Ironforges",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "found near the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Order of Three",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Order of Three consists",
+        "confidence": "high"
+      },
+      {
+        "referent": "Silent Fist Clan",
+        "type": "faction",
+        "how": "name",
+        "evidence": "house of the Silent Fist Clan",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "training the Qeynos Guard in hand",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hold",
+        "type": "place",
+        "how": "name",
+        "evidence": "Qeynos Hold in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "catch the ship to Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Commander Kane Bayle is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "second only to his brother, Antonius Bayle",
+        "confidence": "high"
+      },
+      {
+        "referent": "Circle of the Unseen Hand",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Circle of the Unseen Hand? I have heard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Within Qeynos are the Knights of Thunder and the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Hall of Thunder",
+        "type": "place",
+        "how": "name",
+        "evidence": "Hall of Thunder lies in South Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Protectors of the Pine",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Protectors of the Pine and Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "druids called the Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Surefall Glade",
+        "type": "place",
+        "how": "name",
+        "evidence": "hollow of Surefall Glade",
+        "confidence": "high"
+      },
+      {
+        "referent": "Captain Linarius Graffe",
+        "type": "npc",
+        "how": "name",
+        "evidence": "commanded by Captain Linarius Graffe",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plains of Karana",
+        "type": "place",
+        "how": "name",
+        "evidence": "northern Plains of Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Clock of Ak'Anon",
+        "type": "place",
+        "how": "name",
+        "evidence": "next to the Clock of Ak'Anon",
+        "confidence": "med"
+      },
+      {
+        "referent": "Lion's Mane Inn and Tavern",
+        "type": "place",
+        "how": "name",
+        "evidence": "recommend the Lion's Mane Inn and Tavern",
+        "confidence": "high"
+      },
+      {
+        "referent": "Fish's",
+        "type": "place",
+        "how": "name",
+        "evidence": "backrooms of Fish's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Captain Tillin Brightblade",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Captain Tillin Brightblade is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ebon Strongbear",
+        "type": "npc",
+        "how": "name",
+        "evidence": "discussing tactics with Ebon Strongbear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sabertooths",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Extermination of the Sabertooths",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow",
+        "type": "place",
+        "how": "name",
+        "evidence": "Sabertooths of Blackburrow",
+        "confidence": "high"
+      },
+      {
+        "referent": "Blackburrow Stout",
+        "type": "item",
+        "how": "name",
+        "evidence": "sell the outland Blackburrow Stout",
+        "confidence": "high"
+      },
+      {
+        "referent": "Firepride's",
+        "type": "place",
+        "how": "name",
+        "evidence": "bridge behind Firepride's",
+        "confidence": "med"
+      },
+      {
+        "referent": "Qeynos Tower Guards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Qeynos Tower Guards of the hills and plains",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 2043,
+    "speaker": "Davloran Girionlis",
+    "mentions": [
+      {
+        "referent": "Rodcet Nife",
+        "type": "npc",
+        "how": "name",
+        "evidence": "if you are a [Paladin of Rodcet]",
+        "confidence": "high"
+      },
+      {
+        "referent": "Helm of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "fashion your very own Helm of the Lightbringer",
+        "confidence": "med"
+      },
+      {
+        "referent": "Bracer of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "fashion your very own Bracer of the Lightbringer",
+        "confidence": "med"
+      },
+      {
+        "referent": "Armguards of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "your very own Armguards of the Lightbringer",
+        "confidence": "med"
+      },
+      {
+        "referent": "Boots of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "fashion your very own Boots of the Lightbringer",
+        "confidence": "med"
+      },
+      {
+        "referent": "Greaves of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "fashion your very own Greaves of the Lightbringer",
+        "confidence": "med"
+      },
+      {
+        "referent": "Gauntlets of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "your very own Gauntlets of the Lightbringer",
+        "confidence": "med"
+      },
+      {
+        "referent": "Breastplate of the Lightbringer",
+        "type": "item",
+        "how": "name",
+        "evidence": "your very own Breastplate of the Lightbringer",
+        "confidence": "med"
+      }
+    ]
+  },
+  {
+    "speaker_id": 45090,
+    "speaker": "Lyris Moonbane",
+    "mentions": [
+      {
+        "referent": "Bertoxxulous",
+        "type": "npc",
+        "how": "name",
+        "evidence": "blessings of Bertoxxulous will most assuredly awaken",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonica",
+        "type": "place",
+        "how": "name",
+        "evidence": "The goblins of Antonica are known",
+        "confidence": "high"
+      },
+      {
+        "referent": "Serpent Spine",
+        "type": "place",
+        "how": "name",
+        "evidence": "citadel in the Sepent Spine",
+        "confidence": "high"
+      },
+      {
+        "referent": "Oggok",
+        "type": "place",
+        "how": "name",
+        "evidence": "The ogres of Oggok don't spend much time",
+        "confidence": "high"
+      },
+      {
+        "referent": "Greenblood",
+        "type": "place",
+        "how": "name",
+        "evidence": "runs near their city, Greenblood",
+        "confidence": "high"
+      },
+      {
+        "referent": "Freeport",
+        "type": "place",
+        "how": "name",
+        "evidence": "We have an agent studying in Freeport",
+        "confidence": "high"
+      },
+      {
+        "referent": "Driana Poxsbourne",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Her name is Driana Poxsbourne",
+        "confidence": "high"
+      },
+      {
+        "referent": "Brother Bruax",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Go to Brother Bruax",
+        "confidence": "high"
+      },
+      {
+        "referent": "Army of the Plaguebringer",
+        "type": "faction",
+        "how": "epithet",
+        "evidence": "army of the Plaguebringer is quietly amassing",
+        "confidence": "med"
+      }
+    ]
+  },
+  {
+    "speaker_id": 45089,
+    "speaker": "Xeture Demiagar",
+    "mentions": [
+      {
+        "referent": "Bertoxxulous",
+        "type": "npc",
+        "how": "name",
+        "evidence": "appeasing of our patron Bertoxxulous, the Plague Lord",
+        "confidence": "high"
+      },
+      {
+        "referent": "Bloodsabers",
+        "type": "faction",
+        "how": "name",
+        "evidence": "as a priest of the Bloodsabers",
+        "confidence": "high"
+      },
+      {
+        "referent": "Torin Krentar",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Take this note to Torin Krentar",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "ruler of this city, Antonius Bayle IV",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "backed by the Knights of Thunder",
+        "confidence": "high"
+      },
+      {
+        "referent": "Karana",
+        "type": "npc",
+        "how": "epithet",
+        "evidence": "Storm Lord Karana",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "epithet",
+        "evidence": "Temple Life, paladins and clerics of the Prime-Healer",
+        "confidence": "high"
+      },
+      {
+        "referent": "Rodcet Nife",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Prime-Healer, Rodcet Nife",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "should the Qeynos Guards discover you",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Catacombs",
+        "type": "place",
+        "how": "name",
+        "evidence": "here in the Qeynos Catacombs",
+        "confidence": "high"
+      },
+      {
+        "referent": "Rolon Banari",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Priest of Life by the name of Rolon Banari",
+        "confidence": "high"
+      },
+      {
+        "referent": "Rihtur",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Go find Rihtur, maybe he has an errand",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1146,
+    "speaker": "Ghul Rustem",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "cursed Ironforge became Antonius Bayle's favorite",
+        "confidence": "high"
+      },
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "cursed Ironforge became Antonius Bayle's favorite",
+        "confidence": "high"
+      },
+      {
+        "referent": "Veeshan",
+        "type": "npc",
+        "how": "name",
+        "evidence": "She that rended the lands and split the sky! Veeshan herself!",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Commander Kane Bayle is the commander",
+        "confidence": "high"
+      },
+      {
+        "referent": "Circle of the Unseen Hand",
+        "type": "faction",
+        "how": "name",
+        "evidence": "Circle of the Unseen Hand? I have heard",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1029,
+    "speaker": "Lord Mrallon",
+    "mentions": [
+      {
+        "referent": "Nyrein Shadowstorm",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Nyrein Shadowstorm spent much of her life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "defending the Jaggedpine from within its confines",
+        "confidence": "high"
+      },
+      {
+        "referent": "The Faceless",
+        "type": "npc",
+        "how": "name",
+        "evidence": "temptations and corruption of The Faceless",
+        "confidence": "high"
+      },
+      {
+        "referent": "Tempest Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "essence of the Tempest Guard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Plane of Fear",
+        "type": "place",
+        "how": "name",
+        "evidence": "He fled to the Plane of Fear",
+        "confidence": "high"
+      },
+      {
+        "referent": "Tempest Reaver",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Find the Tempest Reaver and retrieve the Essence",
+        "confidence": "high"
+      },
+      {
+        "referent": "Lady Deira",
+        "type": "npc",
+        "how": "name",
+        "evidence": "return it to Lady Deira",
+        "confidence": "high"
+      },
+      {
+        "referent": "Karana",
+        "type": "npc",
+        "how": "epithet",
+        "evidence": "devotion to The Rainkeeper",
+        "confidence": "high"
+      },
+      {
+        "referent": "Cazic-Thule",
+        "type": "npc",
+        "how": "name",
+        "evidence": "resides in the realm of Cazic-Thule himself",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 3008,
+    "speaker": "Raken",
+    "mentions": [
+      {
+        "referent": "Tunare",
+        "type": "npc",
+        "how": "name",
+        "evidence": "ruled by no single hand other than Tunare",
+        "confidence": "high"
+      },
+      {
+        "referent": "Te`Anara",
+        "type": "npc",
+        "how": "name",
+        "evidence": "speak with Te`Anara. She is the head",
+        "confidence": "high"
+      },
+      {
+        "referent": "Jaggedpine Treefolk",
+        "type": "faction",
+        "how": "name",
+        "evidence": "she is the head of the Jaggedpine Treefolk",
+        "confidence": "high"
+      },
+      {
+        "referent": "Hager Sureshot",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Hager Sureshot of the Protectors of the Pine",
+        "confidence": "high"
+      },
+      {
+        "referent": "Protectors of the Pine",
+        "type": "faction",
+        "how": "name",
+        "evidence": "masters of the Protectors of the Pine",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos",
+        "type": "place",
+        "how": "name",
+        "evidence": "You must venture to Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Guard",
+        "type": "faction",
+        "how": "name",
+        "evidence": "serve alongside the Qeynos Guard",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos Hold",
+        "type": "place",
+        "how": "name",
+        "evidence": "try the Qeynos Hold in Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Talym Shoontar",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Talym Shoontar is a wanted man",
+        "confidence": "high"
+      },
+      {
+        "referent": "Miller Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "The entire Miller family are nothing more than scum",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erud's Crossing",
+        "type": "place",
+        "how": "name",
+        "evidence": "wide as the span of Erud's Crossing",
+        "confidence": "high"
+      },
+      {
+        "referent": "Veeshan",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Some say it was the great dragon, Veeshan!",
+        "confidence": "high"
+      },
+      {
+        "referent": "Great Tunarbos",
+        "type": "item",
+        "how": "name",
+        "evidence": "the Great Tunarbos was shattered",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 2111,
+    "speaker": "Whysia Flock",
+    "mentions": [
+      {
+        "referent": "Tyokan Mekase",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Tyokan Mekase is the day merchant here",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "unwelcome in the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Shining Star of Life",
+        "type": "item",
+        "how": "name",
+        "evidence": "recharging your Shining Star of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "blessed necklaces of the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Rodcet Nife",
+        "type": "npc",
+        "how": "epithet",
+        "evidence": "power of the Prime Healer guide you",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 2039,
+    "speaker": "Enic Ruklin",
+    "mentions": [
+      {
+        "referent": "Rodcet Nife",
+        "type": "npc",
+        "how": "name",
+        "evidence": "In the name of Rodcet Nife, of course",
+        "confidence": "high"
+      },
+      {
+        "referent": "Pool of Jahnda",
+        "type": "place",
+        "how": "name",
+        "evidence": "protecting the [Pool of Jahnda] and its fish",
+        "confidence": "high"
+      },
+      {
+        "referent": "Frostbite",
+        "type": "npc",
+        "how": "name",
+        "evidence": "a beast by the name of [Frostbite]",
+        "confidence": "high"
+      },
+      {
+        "referent": "Koalindl",
+        "type": "npc",
+        "how": "name",
+        "evidence": "slurped up another one of the sacred fish, the Koalindl",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priestess Jahnda",
+        "type": "npc",
+        "how": "name",
+        "evidence": "a gift to Priestess Jahnda from the Prime Healer",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Knights of Thunder are a respected order",
+        "confidence": "high"
+      },
+      {
+        "referent": "Halas",
+        "type": "place",
+        "how": "name",
+        "evidence": "I cannot see them coming from Halas",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1119,
+    "speaker": "Ton Firepride",
+    "mentions": [
+      {
+        "referent": "Ironforge Family",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Ironforge family has called Qeynos their own",
+        "confidence": "high"
+      },
+      {
+        "referent": "Kane Bayle",
+        "type": "npc",
+        "how": "role",
+        "evidence": "If Kane were in charge, things would be different",
+        "confidence": "high"
+      },
+      {
+        "referent": "Lanhern",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Lanhern is a good woman",
+        "confidence": "high"
+      },
+      {
+        "referent": "Knights of Thunder",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The Knights of Thunder are no friends of mine",
+        "confidence": "high"
+      },
+      {
+        "referent": "Garuc",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Maybe Garuc will reward you for such a vile deed",
+        "confidence": "high"
+      },
+      {
+        "referent": "Vicus Nonad",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Vicus has got some other sap to do his work",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1131,
+    "speaker": "Eve Marsinger",
+    "mentions": [
+      {
+        "referent": "Lislia Goldtune",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Take this pouch to Lislia Goldtune in Highpass",
+        "confidence": "high"
+      },
+      {
+        "referent": "Highpass",
+        "type": "place",
+        "how": "name",
+        "evidence": "at the entrance to HighKeep",
+        "confidence": "high"
+      },
+      {
+        "referent": "Felisity Starbright",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Take this letter to Felisity Starbright in Freeport",
+        "confidence": "high"
+      },
+      {
+        "referent": "Freeport",
+        "type": "place",
+        "how": "name",
+        "evidence": "letter to Felisity Starbright in Freeport",
+        "confidence": "high"
+      },
+      {
+        "referent": "Sivina Lutewhisper",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Sivina Lutewhisper, Marton Stringsinger, Ticar Lorestring",
+        "confidence": "high"
+      },
+      {
+        "referent": "Marton Stringsinger",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Marton Stringsinger lives with the barbarians",
+        "confidence": "high"
+      },
+      {
+        "referent": "Ticar Lorestring",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Ticar Lorestring sings for the people of Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "Mistrana Two-Notes",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Mistrana Two-Notes is currently visiting",
+        "confidence": "high"
+      },
+      {
+        "referent": "Tralyn Marsinger",
+        "type": "npc",
+        "how": "name",
+        "evidence": "report to my husband, Tralyn",
+        "confidence": "high"
+      },
+      {
+        "referent": "League of Antonican Bards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The League of Antonican Bards has a courier system",
+        "confidence": "high"
+      },
+      {
+        "referent": "Halas",
+        "type": "place",
+        "how": "name",
+        "evidence": "lives with the barbarians in the city of Halas",
+        "confidence": "high"
+      },
+      {
+        "referent": "Surefall Glade",
+        "type": "place",
+        "how": "name",
+        "evidence": "Sivina Lutewhisper lives with the rangers in Surefall Glade",
+        "confidence": "high"
+      },
+      {
+        "referent": "Erudin",
+        "type": "place",
+        "how": "name",
+        "evidence": "sings for the people of the city of Erudin",
+        "confidence": "high"
+      },
+      {
+        "referent": "McMannus Tribe",
+        "type": "faction",
+        "how": "name",
+        "evidence": "visiting with the McMannus tribe in the Karanas",
+        "confidence": "high"
+      },
+      {
+        "referent": "Karanas",
+        "type": "place",
+        "how": "name",
+        "evidence": "visiting with the McMannus tribe in the Karanas",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1163,
+    "speaker": "Raffy Conticede",
+    "mentions": [
+      {
+        "referent": "Karana",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Karana, the Rainkeeper, is the provider of the storms",
+        "confidence": "high"
+      },
+      {
+        "referent": "Bertoxxulous",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Bertoxxulous, the Plaguebringer, is the Lord of Disease",
+        "confidence": "high"
+      },
+      {
+        "referent": "Bloodsabers",
+        "type": "faction",
+        "how": "name",
+        "evidence": "vile church of the damned are called the Bloodsabers",
+        "confidence": "high"
+      },
+      {
+        "referent": "Chesgard Sydwend",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Speak more of this matter with Chesgard Sydwend",
+        "confidence": "high"
+      },
+      {
+        "referent": "Priests of Life",
+        "type": "faction",
+        "how": "name",
+        "evidence": "suggest you speak with the Priests of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Temple of Life",
+        "type": "place",
+        "how": "name",
+        "evidence": "find them in the Temple of Life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Daedet Losaren",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Daedet Losaren charges followers of Karana",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1047,
+    "speaker": "Vicus Nonad",
+    "mentions": [
+      {
+        "referent": "Antonius Bayle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Antonius Bayle and the People of Qeynos appreciate",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1031,
+    "speaker": "an investigator",
+    "mentions": [
+      {
+        "referent": "Helminth",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Guard Helminth found a false wall",
+        "confidence": "high"
+      },
+      {
+        "referent": "Vegalys",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Vegalys sent you. I'm done for",
+        "confidence": "high"
+      },
+      {
+        "referent": "Azibelle",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Bring this Azibelle to justice",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 2038,
+    "speaker": "Hurrieta Ironforge",
+    "mentions": [
+      {
+        "referent": "Tayla",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Tayla! She is no Ironforge",
+        "confidence": "high"
+      },
+      {
+        "referent": "Waleana",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Waleana is a stain on Brohan's life",
+        "confidence": "high"
+      },
+      {
+        "referent": "Brohan",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Brohan has moved onto better things and more sanity",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 3006,
+    "speaker": "Sivina Lutewhisper",
+    "mentions": [
+      {
+        "referent": "League of Antonican Bards",
+        "type": "faction",
+        "how": "name",
+        "evidence": "The League of Antonican Bards has a courier system",
+        "confidence": "high"
+      },
+      {
+        "referent": "Tralyn Marsinger",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Take this letter to Tralyn Marsinger in Qeynos",
+        "confidence": "high"
+      },
+      {
+        "referent": "Qeynos",
+        "type": "place",
+        "how": "name",
+        "evidence": "one that needs to go to Qeynos",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1141,
+    "speaker": "Iala Lenard",
+    "mentions": []
+  },
+  {
+    "speaker_id": 1120,
+    "speaker": "Gahna Salbeen",
+    "mentions": [
+      {
+        "referent": "Qeynos",
+        "type": "place",
+        "how": "name",
+        "evidence": "Qeynos is the place where I will make a fortune",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1104,
+    "speaker": "Tasya Huntlan",
+    "mentions": [
+      {
+        "referent": "Vicus Nonad",
+        "type": "npc",
+        "how": "name",
+        "evidence": "Give Vicus our best. I hear he is under the weather",
+        "confidence": "high"
+      },
+      {
+        "referent": "Lion's Mane Inn",
+        "type": "place",
+        "how": "name",
+        "evidence": "staying here at the Lion's Mane Inn",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 1082,
+    "speaker": "Indaria",
+    "mentions": [
+      {
+        "referent": "Qeynos Aqueducts",
+        "type": "place",
+        "how": "name",
+        "evidence": "went to play near the aqueducts",
+        "confidence": "med"
+      }
+    ]
+  },
+  {
+    "speaker_id": 4189,
+    "speaker": "Hadden",
+    "mentions": [
+      {
+        "referent": "Qeynos",
+        "type": "place",
+        "how": "name",
+        "evidence": "sell to my merchant friends in Qeynos",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 2071,
+    "speaker": "Rendallen Ironforge",
+    "mentions": [
+      {
+        "referent": "Ironforge Weapons",
+        "type": "place",
+        "how": "name",
+        "evidence": "welcome to Ironforge Weapons!",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "speaker_id": 4204,
+    "speaker": "Buzzlin Bornahm",
+    "mentions": []
+  }
+]

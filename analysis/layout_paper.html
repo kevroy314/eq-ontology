@@ -1,0 +1,345 @@
+<title>Making Machine-Drawn Ontologies Look Hand-Drawn</title>
+<style>
+  :root{
+    --paper:#f4f6f8; --card:#ffffff; --ink:#161b22; --mut:#55616f; --faint:#8b95a3;
+    --line:#dde2e8; --rule:#c9d1da; --accent:#1c7fa6; --accent2:#9c6c08; --node:#1c7fa6;
+    --box:#eef2f6; --code:#eef2f6;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Charter,Cambria,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--paper:#0e1116; --card:#151a21; --ink:#e6edf3; --mut:#9aa7b4; --faint:#66727f;
+      --line:#242d38; --rule:#2c3744; --accent:#5ec8f2; --accent2:#f2b705; --node:#5ec8f2;
+      --box:#171d26; --code:#131922;}
+  }
+  :root[data-theme="light"]{--paper:#f4f6f8;--card:#ffffff;--ink:#161b22;--mut:#55616f;--faint:#8b95a3;
+    --line:#dde2e8;--rule:#c9d1da;--accent:#1c7fa6;--accent2:#9c6c08;--node:#1c7fa6;--box:#eef2f6;--code:#eef2f6;}
+  :root[data-theme="dark"]{--paper:#0e1116;--card:#151a21;--ink:#e6edf3;--mut:#9aa7b4;--faint:#66727f;
+    --line:#242d38;--rule:#2c3744;--accent:#5ec8f2;--accent2:#f2b705;--node:#5ec8f2;--box:#171d26;--code:#131922;}
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--serif);font-size:18px;line-height:1.62;
+    font-feature-settings:"kern","liga";text-rendering:optimizeLegibility}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 24px 100px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  a:hover{border-bottom-color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+  .eyebrow{font-family:var(--sans);font-size:12.5px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent)}
+  h1{font-size:40px;line-height:1.1;margin:.35em 0 .3em;font-weight:700;letter-spacing:-.015em;text-wrap:balance}
+  .dek{font-size:20px;color:var(--mut);margin:0 0 22px;font-style:italic;max-width:64ch;text-wrap:pretty}
+  .meta{font-family:var(--sans);font-size:13px;color:var(--faint);letter-spacing:.02em;
+    display:flex;flex-wrap:wrap;gap:6px 18px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:12px 0;margin-bottom:8px}
+  .meta b{color:var(--mut);font-weight:600}
+  /* header graph motif */
+  .motif{width:100%;height:70px;margin:14px 0 4px;display:block}
+  /* abstract */
+  .abstract{background:var(--box);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:18px 22px;margin:26px 0 8px;font-size:16.5px;line-height:1.58}
+  .abstract .lbl{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);display:block;margin-bottom:6px}
+  /* TOC */
+  nav.toc{font-family:var(--sans);font-size:14.5px;margin:26px 0 10px;columns:2;column-gap:34px}
+  nav.toc a{display:block;padding:3px 0;border:0;color:var(--mut)}
+  nav.toc a:hover{color:var(--accent)}
+  nav.toc a b{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:8px}
+  @media(max-width:620px){nav.toc{columns:1}}
+  /* sections on a node-link rail */
+  article{position:relative;margin-top:20px}
+  section{position:relative;padding-left:52px;margin-top:44px}
+  section::before{content:"";position:absolute;left:15px;top:8px;bottom:-44px;width:2px;
+    background:linear-gradient(var(--rule),var(--rule));}
+  section:last-of-type::before{display:none}
+  section>h2{position:relative;margin:0 0 12px;font-size:25px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+  section>h2 .num{position:absolute;left:-52px;top:-2px;width:32px;height:32px;border-radius:50%;
+    background:var(--card);border:2px solid var(--node);color:var(--node);
+    font-family:var(--sans);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    z-index:1;font-variant-numeric:tabular-nums}
+  h3{font-size:18.5px;margin:26px 0 6px;color:var(--ink);font-weight:700;font-family:var(--sans);letter-spacing:-.005em}
+  p{margin:0 0 15px}
+  .lead{font-size:19px}
+  strong{font-weight:700}
+  em cite,cite{font-style:italic;color:var(--mut)}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin:7px 0}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code);padding:1px 6px;border-radius:5px;
+    border:1px solid var(--line)}
+  /* callout */
+  .call{background:var(--box);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:20px 0}
+  .call .tag{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--accent2);display:block;margin-bottom:7px}
+  .eq{font-family:var(--mono);font-size:15px;line-height:1.75;background:var(--code);border:1px solid var(--line);
+    border-radius:8px;padding:16px 18px;margin:8px 0 12px;overflow-x:auto;white-space:pre;color:var(--ink)}
+  .eqkey{font-family:var(--sans);font-size:14px;color:var(--mut)}
+  /* pull quote */
+  blockquote{margin:22px 0;padding:6px 0 6px 20px;border-left:3px solid var(--accent2);
+    font-size:20px;line-height:1.4;color:var(--ink)}
+  blockquote p{margin:0}
+  /* tables */
+  .tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:13.5px}
+  th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--box);color:var(--mut);font-weight:700;letter-spacing:.02em;position:sticky;top:0}
+  tbody tr:last-child td{border-bottom:0}
+  td .best{color:var(--accent);font-weight:700}
+  /* figure caption / step list */
+  .steps{counter-reset:st;list-style:none;padding-left:0}
+  .steps li{position:relative;padding-left:40px;margin:14px 0}
+  .steps li::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:1px;
+    width:26px;height:26px;border-radius:7px;background:var(--accent);color:var(--paper);
+    font-family:var(--sans);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .steps li b{font-family:var(--sans);font-size:15px}
+  /* references */
+  .refs{font-family:var(--sans);font-size:13.5px;line-height:1.5;color:var(--mut)}
+  .refs h3{font-family:var(--sans);color:var(--accent);font-size:14px;letter-spacing:.04em;
+    text-transform:uppercase;margin:20px 0 8px}
+  .refs ul{list-style:none;padding:0}
+  .refs li{margin:6px 0;padding-left:20px;text-indent:-20px}
+  .refs .au{color:var(--ink);font-weight:600}
+  .flag{color:var(--accent2)}
+  hr.big{border:0;border-top:1px solid var(--line);margin:40px 0}
+  .foot{font-family:var(--sans);font-size:12.5px;color:var(--faint);margin-top:40px;
+    border-top:1px solid var(--line);padding-top:16px}
+  sup a{border:0;font-size:.7em;font-weight:700}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Working paper · EverQuest Ontology Project</div>
+  <h1>Making Machine-Drawn Ontologies Look Hand-Drawn</h1>
+  <p class="dek">A literature review and design proposal for laying out a knowledge graph the way a person would: locally readable, cluster-by-cluster, grounded in place — not globally symmetric.</p>
+  <div class="meta">
+    <span><b>Prepared for</b> the Qeynos quest-connectivity ontology</span>
+    <span><b>Date</b> 2026-07-04</span>
+    <span><b>Scope</b> ~200-node typed ontology, faction clusters, spatial anchors</span>
+    <span><b>Reading</b> ~18 min</span>
+  </div>
+  <svg class="motif" viewBox="0 0 820 70" fill="none" aria-hidden="true">
+    <g stroke="var(--rule)" stroke-width="1.2">
+      <path d="M60 35 L150 18 M60 35 L150 52 M150 18 L150 52 M150 18 L250 20 M150 52 L250 55 M250 20 L250 55"/>
+      <path d="M250 20 L360 35 M250 55 L360 35 M360 35 L470 22 M360 35 L470 50 M470 22 L470 50"/>
+      <path d="M470 22 L580 30 M470 50 L580 45 M580 30 L580 45 M580 30 L690 20 M580 45 L690 52 M690 20 L690 52 M690 20 L760 36 M690 52 L760 36"/>
+    </g>
+    <g fill="var(--node)">
+      <circle cx="60" cy="35" r="4.5"/><circle cx="150" cy="18" r="4"/><circle cx="150" cy="52" r="4"/>
+      <circle cx="250" cy="20" r="4"/><circle cx="250" cy="55" r="4"/><circle cx="360" cy="35" r="5"/>
+      <circle cx="470" cy="22" r="4"/><circle cx="470" cy="50" r="4"/><circle cx="580" cy="30" r="4"/>
+      <circle cx="580" cy="45" r="4"/><circle cx="690" cy="20" r="4"/><circle cx="690" cy="52" r="4"/>
+      <circle cx="760" cy="36" r="4.5"/>
+    </g>
+    <g fill="var(--accent2)"><circle cx="360" cy="35" r="2.4"/></g>
+  </svg>
+</header>
+
+<div class="abstract">
+  <span class="lbl">Abstract</span>
+  Automated graph layouts — including those an LLM writes in one shot — tend to look mechanical: rings, columns, and grids with lines offset at awkward angles, text colliding, and structure that only resolves at a zoom nobody reads at. Hand-drawn ontologies look different because people draw them <em>iteratively and hierarchically</em>, one cluster at a time, minimising local confusion rather than maximising global symmetry. This paper diagnoses why the machine version is hard — an objective mismatch, a multi-objective conflict, two NP-hard sub-problems, and a feedback loop LLMs cannot close — then reviews four bodies of work (readability &amp; human factors, layout algorithms, spatial/semantic embedding, and edge/label/focus techniques) and proposes a concrete pipeline for our EverQuest ontology: a <strong>spatially-anchored, constraint-based, focus+context</strong> layout in which every entity is seeded near its in-world origin (its guild house), factions become containment groups, and an LLM proposes <em>constraints and critiques</em> rather than pixel geometry.
+</div>
+
+<nav class="toc" aria-label="Contents">
+  <a href="#p1"><b>1</b>Why this is hard</a>
+  <a href="#p2"><b>2</b>What humans actually optimise</a>
+  <a href="#p3"><b>3</b>Layout algorithms</a>
+  <a href="#p4"><b>4</b>Grounding layout in place</a>
+  <a href="#p5"><b>5</b>Edges, labels &amp; focus</a>
+  <a href="#p6"><b>6</b>Proposed pipeline</a>
+  <a href="#p7"><b>7</b>The LLM's real job</a>
+  <a href="#p8"><b>8</b>Roadmap</a>
+  <a href="#refs"><b>·</b>References</a>
+</nav>
+
+<article>
+
+<section id="p1">
+  <h2><span class="num">1</span>Why this is hard</h2>
+  <p class="lead">The failure is not laziness in the algorithm; it is four structural problems stacked on top of each other.</p>
+
+  <h3>1.1 An objective mismatch</h3>
+  <p>Most layout engines minimise a <em>global</em> energy — total stress, total edge crossings, total edge length. But people do not read a graph globally. They trace a path from one node to a neighbour, and the cost of that trace is dominated by the crossings <em>on that path</em> and by how straight it stays (<cite>Ware, Purchase, Colpoys &amp; McGill 2002</cite>; <cite>Purchase 1997</cite>). A drawing can be beautifully symmetric at the whole-graph scale and still be miserable to read locally. As you put it: we almost never read at large scale, so large-scale symmetry is the wrong thing to buy. Optimising a global scalar quietly trades away the local legibility that actually carries comprehension.</p>
+
+  <h3>1.2 A multi-objective conflict with no free lunch</h3>
+  <p>"Readable" decomposes into goals that actively fight each other: <em>few crossings</em> wants nodes spread out; <em>compact clusters</em> wants them close; <em>honour the spatial anchor</em> wants a node at its origin even if that creates a crossing; <em>non-overlapping labels</em> wants yet more space; <em>short uniform edges</em> wants something else again. There is no single arrangement that wins all of these, only Pareto trade-offs — and most tools optimise exactly one axis and let the others fall where they may. The columnar and radial layouts we have been producing are what you get when you optimise "no ambiguity about which column a node is in" and sacrifice everything else.</p>
+
+  <h3>1.3 Two of the sub-problems are NP-hard</h3>
+  <p>Crossing minimisation is NP-hard; so is point-feature label placement (<cite>Christensen, Marks &amp; Shieber 1995</cite>). We cannot solve either exactly at interactive speed, so every real system runs heuristics that need <em>iteration</em> and a good initialisation to land in a decent local optimum. Closed-form parametric geometry — a ring, a grid, evenly-spaced columns — is the one thing that needs <em>no</em> iteration and no solver. It is the degenerate "give up gracefully" answer, and it is exactly what a system reaches for when it has no optimisation loop to run.</p>
+
+  <div class="call">
+    <span class="tag">The LLM-specific failure</span>
+    <p style="margin:0">An LLM writes layout <em>code in a single forward pass</em> and never sees the picture it produced. A human designer runs a loop — place, render, look, nudge, repeat — using vision as the objective function. Denied that loop, the model cannot do gradient descent on an image it cannot perceive, so it emits geometry that is <strong>correct by construction</strong> (rings and columns can't "come out wrong") instead of <strong>emergent geometry that only looks right after iteration</strong>. The fix is not a better one-shot prompt; it is to give the model the loop — a solver for the geometry and a way to see and critique the result (§7).</p>
+  </div>
+
+  <h3>1.4 The picture also has to stay honest and stable</h3>
+  <p>Two further constraints bound the space. A layout must be <em>faithful</em>: distinct structures must produce distinct drawings, or the picture lies about the data (<cite>Nguyen, Eades &amp; Hong 2013</cite>; <cite>Eades, Hong, Nguyen &amp; Klein 2017</cite>). And when the graph is edited or re-generated it should preserve the viewer's <em>mental map</em> — keep relative positions stable so the reader doesn't have to relearn it (<cite>Misue, Eades, Lai &amp; Sugiyama 1995</cite>). An anchored layout, happily, buys both almost for free.</p>
+</section>
+
+<section id="p2">
+  <h2><span class="num">2</span>What humans actually optimise</h2>
+  <p>Three decades of controlled studies converge on a surprisingly short priority list — and it is not the list that classical algorithms optimise.</p>
+
+  <p><strong>Crossings first, but only the ones on the path you trace.</strong> Across Helen Purchase's experiments, reducing edge crossings is by far the largest readability effect; bend and symmetry reduction help less; maximising the minimum angle and strict orthogonality were <em>not</em> statistically significant (<cite>Purchase 1997, 2002</cite>). Eye-tracking refined this: it is crossings <em>on the traced path</em>, and <em>acute</em> crossings, that hurt — crossings near 90° cost little (<cite>Huang, Eades &amp; Hong 2008</cite>). So: protect the paths users actually follow, and where crossings are unavoidable, make them square.</p>
+
+  <p><strong>Continuity.</strong> Shortest-path reading is fastest along long, straight, low-deviation routes (<cite>Ware et al. 2002</cite>). A path that stays roughly straight through each node reads as one gesture; one that kinks at every node reads as many.</p>
+
+  <p><strong>Cluster by coupling, and enclose the cluster.</strong> When people position nodes by hand they recover the community structure and place clusters <em>closer together the more tightly they are coupled</em> — inter-cluster distance encodes connection strength (<cite>van Ham &amp; Rogowitz 2008</cite>). Grouping is strengthened not just by proximity but by <em>common region</em> — a shared tint or enclosure — and by <em>uniform connectedness</em>, which are stronger Gestalt cues than proximity alone (<cite>Palmer 1992</cite>; <cite>Palmer &amp; Rock 1994</cite>). Good human layouts also beat automatic orthogonal and circular layouts on task performance; the best hand layouts rival force-directed ones (<cite>Dwyer et al. 2009</cite>).</p>
+
+  <blockquote><p>The target is not a symmetric whole. It is a set of compact, enclosed neighbourhoods, each locally legible, spaced by how much they talk to each other.</p></blockquote>
+</section>
+
+<section id="p3">
+  <h2><span class="num">3</span>Layout algorithms, and which one fits</h2>
+  <p>The family tree runs from spring embedders to constraint solvers, and the fit for a ~200-node clustered ontology is not the obvious one.</p>
+
+  <p><strong>Force-directed</strong> methods (<cite>Eades 1984</cite>; <cite>Fruchterman &amp; Reingold 1991</cite>; <cite>Kamada &amp; Kawai 1989</cite>) give the organic look but collapse dense graphs into hairballs and separate clusters unreliably. <strong>Stress majorization</strong> (<cite>Gansner, Koren &amp; North 2004</cite>) — the model behind Graphviz <code>neato</code>/<code>sfdp</code> — respects global structure far better; <strong>stochastic gradient descent</strong> on the same stress objective reaches lower stress, more reliably, and without a good starting layout (<cite>Zheng, Pawar &amp; Goodrich 2018/2019</cite>). <strong>Sugiyama</strong> layered layouts (<cite>Sugiyama, Tagawa &amp; Toda 1981</cite>; tools <code>dagre</code>, <code>dot</code>, ELK) are excellent when a dominant flow direction exists, but our factions are not a hierarchy, so layering imposes a false one.</p>
+
+  <p>The decisive family is <strong>constraint-based stress</strong>. <cite>Dwyer, Koren &amp; Marriott (2006)</cite> extend stress majorization with separation constraints (IPSep-CoLa); <cite>Dwyer (2009)</cite> is the algorithm in <strong>cola.js / WebCoLa</strong>, supporting alignment, containment/grouping, page-boundary, and non-overlap constraints, with fast node-overlap removal (<cite>Dwyer, Marriott &amp; Stuckey 2005</cite>). <strong>SetCoLa</strong> (<cite>Hoffswell, Borning &amp; Heer 2018</cite>) lets you declare node <em>sets</em> by a data property — <code>faction</code>, in our case — and attach constraints per set, which collapses the specification effort. Multilevel methods (<cite>Walshaw 2003</cite>; <cite>Hachul &amp; Jünger FM³</cite>) are held in reserve for scale; <strong>Group-in-a-Box</strong> (<cite>Rodrigues et al. 2011</cite>) is a good fallback that treemaps the canvas into per-cluster boxes but reads boxy rather than organic. Orthogonal/HOLA drawings (<cite>Tamassia 1987</cite>; <cite>Kieffer et al. 2016</cite>) are clean but read "engineered."</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Family</th><th>Fit for us</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Force-directed (D3-force)</td><td>Poor–Fair</td><td>Organic but hairballs; no grouping or anchoring.</td></tr>
+      <tr><td>Stress / SGD (neato, sfdp)</td><td>Good</td><td>Faithful structure, clean separation; no native groups/anchors.</td></tr>
+      <tr><td class="best">Constraint stress (cola.js + SetCoLa)</td><td><span class="best">Best</span></td><td>Organic core <em>plus</em> containment, non-overlap, alignment, soft anchors — exactly our feature set, in the browser.</td></tr>
+      <tr><td>Sugiyama layered (dagre, ELK)</td><td>Situational</td><td>Only if a real flow direction exists; else false layering.</td></tr>
+      <tr><td>Group-in-a-Box</td><td>Backup</td><td>Guaranteed compact clusters, but rigid boxy partition.</td></tr>
+      <tr><td>Orthogonal / HOLA</td><td>Wrong aesthetic</td><td>Few crossings, but engineered not organic.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="p4">
+  <h2><span class="num">4</span>Grounding the layout in place</h2>
+  <p>This is the lever specific to our data, and the most promising one. Almost every entity has a canonical origin: an NPC belongs to a guild house and has spawn coordinates; a faction has a seat; a zone <em>is</em> a place. That is a ready-made spatial prior — the layout does not have to invent positions from connectivity alone, it can start from geography and relax.</p>
+
+  <p>The design vocabulary for this is <strong>semantic-substrate</strong> layout, where position is assigned by attributes rather than emerging from edges (<cite>Shneiderman &amp; Aris 2006</cite>). The reliable mechanism is a <strong>soft anchor</strong>: seed each node at its origin, then relax under a combined objective that trades connectivity stress against a spring pulling each node back toward its origin. Empirically, a "pseudo-geographic" layout — geographic seed, then relaxation — matches or beats a purely geographic one while staying locatable (<cite>Hale, McNeill &amp; Bright 2017</cite>), and the seed-then-refine pattern is the single most reliable stability trick in the dimensionality-reduction layout literature (<cite>Kruiger et al., tsNET, 2017</cite>, initialised from PivotMDS — <cite>Brandes &amp; Pich 2006</cite>).</p>
+
+  <div class="call">
+    <span class="tag">The objective</span>
+    <div class="eq">E(X) =  Σ  w_ij ( ‖X_i − X_j‖ − d_ij )²   +   λ · Σ  α_i · ‖X_i − p_i‖²
+        i&lt;j                                    i
+       └─────── connectivity stress ───────┘     └─── spatial prior ───┘</div>
+    <p class="eqkey" style="margin:0"><code>X_i</code> = screen position of entity <em>i</em>; <code>d_ij</code> = graph distance (shortest path); <code>w_ij = d_ij⁻²</code>; <code>p_i</code> = the entity's origin (guild-house / spawn x,y, rescaled); <code>α_i</code> = per-entity anchor confidence (high for an NPC with a clear home, 0 for a free-floater); <code>λ</code> = one global dial from "fully emergent" (λ→0) to "pinned to geography" (λ→∞). The anchor term is quadratic, so it folds into the stress-majorization solve as a diagonal addition <code>λα_i</code> to the Laplacian and <code>λα_i p_i</code> to the right-hand side — it even regularises away the null space of disconnected components, a free stability win.</p>
+  </div>
+
+  <p>Neural layout — <cite>DeepDrawing 2019</cite>, <cite>DeepGD</cite>, <cite>SmartGD 2024</cite> — can imitate a human style or optimise non-differentiable aesthetics, but none ingests a geographic prior out of the box and all need training data. For v1 the stress-plus-anchor objective gives the human-like, origin-faithful result directly and interpretably; revisit learned models only to chase exotic aesthetics later.</p>
+</section>
+
+<section id="p5">
+  <h2><span class="num">5</span>Edges, labels, and keeping the working set on screen</h2>
+  <p>These are the three problems you named — awkward lines, colliding text, and structure that only resolves when the whole thing is too big to read — and each has a mature remedy.</p>
+
+  <h3>5.1 Edges: bundle honestly, don't sprawl</h3>
+  <p>Plain proximity bundling is <em>ambiguous</em> — a bundle can imply connections that don't exist (<cite>Bach et al. 2017</cite>). The current best answer is <strong>Edge-Path Bundling</strong> (<cite>Wallinger et al. 2022</cite>), which routes each edge along a weighted shortest path so bundles correspond to real connectivity, or <strong>confluent "train-track" junctions</strong> (<cite>Dickerson et al. 2003</cite>). Bundle only <em>inter-cluster</em> edges; give each faction a single gateway waypoint so cross-links share ordered <strong>docking lanes</strong>, and use <strong>divided edge bundling</strong> (<cite>Selassie, Heller &amp; Heer 2011</cite>) so A→B and B→A don't overlap. Intra-cluster edges stay short and gently curved — <strong>Lombardi</strong>-style arcs with even angular spacing give the hand-drawn feel (<cite>Duncan et al. 2010</cite>) — but cap curvature so you don't trade crossings for prettiness (<cite>Xu et al. 2012</cite>).</p>
+
+  <h3>5.2 Labels: solve them <em>with</em> the layout, not after</h3>
+  <p>Run <strong>PRISM</strong> proximity-preserving overlap removal first (<cite>Gansner &amp; Hu 2010</cite>), then <strong>simulated-annealing</strong> point-feature placement for the final positions (<cite>Christensen, Marks &amp; Shieber 1995</cite>; the basis of D3-Labeler, a few seconds for ~150 labels). Apply Imhof's cartographic defaults — one label per node, above-right, never straddling an edge (<cite>Imhof 1975</cite>). Reserve label boxes as non-overlap constraints in cola.js so geometry and labelling are solved jointly, exactly as metro-map layouts do (<cite>Nöllenburg &amp; Wolff 2011</cite>). In dense regions, don't show everything: reveal minor labels on hover via <strong>excentric labeling</strong> (<cite>Fekete &amp; Plaisant 1999</cite>) or push crowded labels to the frame with leaders.</p>
+
+  <h3>5.3 Focus + context: read locally, at a readable size</h3>
+  <p>This is the direct answer to "on screen without being too large." Adopt a graph <strong>degree-of-interest</strong> model (<cite>Furnas 1986</cite>; <cite>van Ham &amp; Perer 2009</cite>): the active faction renders in full, with a one-hop context ring, while distant factions collapse into aggregate super-nodes (<cite>Gansner, Koren &amp; North, topological fisheye, 2005</cite>). Layer <strong>semantic zoom</strong> so glyphs → labels → edges appear as a cluster is enlarged, keeping information density roughly constant, and optionally a <strong>focus+context</strong> distortion that enlarges the focus and compresses the rest to fit the viewport (<cite>Wang &amp; Chi 2011</cite>). The working set stays local, legible, and bounded — which is how people read.</p>
+</section>
+
+<section id="p6">
+  <h2><span class="num">6</span>Proposed pipeline for the Qeynos ontology</h2>
+  <p>Concretely, replacing the current columnar SVG with a spatially-anchored, constraint-based, focus+context renderer:</p>
+  <ol class="steps">
+    <li><b>Harvest origins.</b> For every entity, pull a prior coordinate <code>p_i</code>: NPC spawn x,y (we already have <code>spawn2.x/y</code>); faction seat = centroid of its members; zone = its map position; item = provider centroid. Set <code>α_i</code> from how canonical the home is.</li>
+    <li><b>Seed geographically, then relax.</b> Initialise <code>X_i = p_i</code>, then run constrained stress/SGD on the §4 objective, annealing <code>λ</code> high→low so clusters compact while still honouring place. Expose <code>λ</code> as one "emergent ↔ anchored" slider.</li>
+    <li><b>Constrain with cola.js + SetCoLa.</b> Declare each faction a containment <em>group</em> (compact convex region, automatic padding), enable non-overlap (nodes and label boxes), add alignment where it tidies, and encode the soft anchors as low-weight position constraints. Space groups so distance ∝ inverse coupling (<cite>van Ham &amp; Rogowitz</cite>).</li>
+    <li><b>Draw common regions.</b> Render each faction as a soft tinted hull (Bubble Sets / concave hull) behind the nodes — the strongest cheap cue that converts an auto-layout into something that reads as deliberate.</li>
+    <li><b>Route edges by class.</b> Intra-cluster: short, low-curvature arcs. Inter-cluster: Edge-Path Bundling through per-faction gateways in divided lanes. Keep the "cross-faction link" highlight we already use — now geometrically bundled, not sprawled.</li>
+    <li><b>Place labels jointly.</b> PRISM overlap removal → simulated-annealing placement → Imhof rules → semantic-zoom level-of-detail, with excentric hover reveal in dense regions.</li>
+    <li><b>Add a focus model.</b> Degree-of-interest around the active faction/entity: full detail + one-hop ring, other factions collapsed to super-nodes; click a super-node to expand (mental-map-preserving transition).</li>
+    <li><b>Measure, don't eyeball.</b> Score candidate layouts on the metrics that matter — crossings <em>on high-traffic paths</em>, crossing angle → 90°, path continuity, cluster separation vs. coupling, a clutter estimate, and a shape-based faithfulness metric — and A/B against the current figure.</li>
+  </ol>
+</section>
+
+<section id="p7">
+  <h2><span class="num">7</span>The LLM's real job in the loop</h2>
+  <p>The through-line of §1.3 is that an LLM should not be emitting pixel geometry at all. Geometry is what solvers are for. The model's comparative advantage is <em>semantic</em> and <em>iterative</em>, so give it those two roles:</p>
+  <p><strong>Propose constraints, not coordinates.</strong> The LLM reads the ontology and emits a high-level layout <em>specification</em> — which entities form a set, which sets should be aligned or kept apart, which relationships are "backbone" and deserve straight uncrossed routes, what the degree-of-interest focus should be. SetCoLa is literally a language for this. The solver turns the spec into geometry; the model never has to get a number right.</p>
+  <p><strong>Close the loop with a perceptual critic.</strong> Render the solver's output to an image, then let a vision-capable model <em>look</em> and critique it against the §2 rules — "the Guards hull overlaps Merchants," "this backbone path crosses four edges acutely," "these two labels collide" — and feed the critique back as amended constraints. That render → look → amend cycle is exactly the iterative, cluster-by-cluster process a human uses, and it is the missing feedback loop from §1.3. It also generalises: the same critic can drive the anneal schedule, the focus expansion, and label LOD.</p>
+  <div class="call">
+    <span class="tag">One-line thesis</span>
+    <p style="margin:0">Stop asking the model to <em>draw</em> the graph. Ask it to <em>specify</em> the drawing and <em>judge</em> the render — and put a constraint solver and a real objective in between. Emergent, hand-drawn-looking geometry is produced by iteration; the LLM's job is to run the iteration intelligently, not to guess its output.</p>
+  </div>
+</section>
+
+<section id="p8">
+  <h2><span class="num">8</span>Roadmap</h2>
+  <p>Phased so each stage ships a visible improvement:</p>
+  <ul>
+    <li><strong>Phase 1 — anchored stress.</strong> Swap the columnar layout for cola.js with faction groups, non-overlap, and spawn-coordinate soft anchors. This alone should kill the sprawl and give organic clusters. <em>(Highest leverage, lowest effort.)</em></li>
+    <li><strong>Phase 2 — hulls &amp; honest edges.</strong> Bubble-set faction hulls; Edge-Path Bundling with divided gateway lanes for cross-faction links.</li>
+    <li><strong>Phase 3 — joint labelling.</strong> PRISM + simulated-annealing placement with semantic-zoom LOD and hover reveal.</li>
+    <li><strong>Phase 4 — focus+context.</strong> Degree-of-interest focus so only the working set is drawn at readable size; expand-on-demand.</li>
+    <li><strong>Phase 5 — the loop.</strong> LLM emits SetCoLa specs; a vision critic scores renders against the §2 metrics and amends constraints. Automate the anneal and focus decisions.</li>
+  </ul>
+  <p>Phases 1–2 are the ones that most directly answer the complaint that "the edges don't cluster in meaningful ways and lines are offset awkwardly." Phases 3–5 are where machine-drawn starts to become indistinguishable from hand-drawn.</p>
+</section>
+
+</article>
+
+<hr class="big">
+<div class="refs" id="refs">
+  <h2 style="font-family:var(--serif);color:var(--ink);font-size:22px;letter-spacing:-.01em;margin:0 0 4px">References</h2>
+  <p style="color:var(--faint)">Grouped by theme. Author/year/venue were verified against DBLP, publisher, or arXiv records during the review; the few details we could not fully confirm are marked <span class="flag">△ verify</span>.</p>
+
+  <h3>Readability &amp; human factors</h3>
+  <ul>
+    <li><span class="au">Purchase, H. C.</span> (1997). Which aesthetic has the greatest effect on human understanding? <em>Graph Drawing '97</em>, LNCS 1353, 248–261.</li>
+    <li><span class="au">Purchase, H. C.</span> (2002). Metrics for graph drawing aesthetics. <em>J. Visual Languages &amp; Computing</em> 13(5), 501–516.</li>
+    <li><span class="au">Ware, C., Purchase, H., Colpoys, L. &amp; McGill, M.</span> (2002). Cognitive measurements of graph aesthetics. <em>Information Visualization</em> 1(2), 103–110.</li>
+    <li><span class="au">Huang, W., Eades, P. &amp; Hong, S.-H.</span> (2008). An eye tracking study into the effects of graph layout. <em>arXiv:0810.4431</em>. <span class="flag">△ verify vol/pages of the 2013 <em>Pers. Ubiquit. Comput.</em> follow-up.</span></li>
+    <li><span class="au">van Ham, F. &amp; Rogowitz, B.</span> (2008). Perceptual organization in user-generated graph layouts. <em>IEEE TVCG</em> 14(6), 1333–1339.</li>
+    <li><span class="au">Dwyer, T. et al.</span> (2009). A comparison of user-generated and automatic graph layouts. <em>IEEE TVCG</em> 15(6), 961–968.</li>
+    <li><span class="au">Nguyen, Q., Eades, P. &amp; Hong, S.-H.</span> (2013). On the faithfulness of graph visualizations. <em>IEEE PacificVis</em>. <span class="flag">△ verify venue vs. arXiv:1701.00921.</span></li>
+    <li><span class="au">Misue, K., Eades, P., Lai, W. &amp; Sugiyama, K.</span> (1995). Layout adjustment and the mental map. <em>JVLC</em> 6(2), 183–210.</li>
+    <li><span class="au">Palmer, S.</span> (1992). Common region: a new principle of perceptual grouping. <em>Cognitive Psychology</em> 24, 436–447. · <span class="au">Palmer, S. &amp; Rock, I.</span> (1994). <em>Psychonomic Bulletin &amp; Review</em> 1, 29–55.</li>
+  </ul>
+
+  <h3>Layout algorithms</h3>
+  <ul>
+    <li><span class="au">Eades, P.</span> (1984). A heuristic for graph drawing. <em>Congressus Numerantium</em> 42, 149–160.</li>
+    <li><span class="au">Fruchterman, T. &amp; Reingold, E.</span> (1991). Graph drawing by force-directed placement. <em>Software: Practice &amp; Experience</em> 21(11), 1129–1164.</li>
+    <li><span class="au">Kamada, T. &amp; Kawai, S.</span> (1989). An algorithm for drawing general undirected graphs. <em>Information Processing Letters</em> 31(1), 7–15.</li>
+    <li><span class="au">Gansner, E., Koren, Y. &amp; North, S.</span> (2004). Graph drawing by stress majorization. <em>Graph Drawing '04</em>, LNCS 3383, 239–250.</li>
+    <li><span class="au">Zheng, J., Pawar, S. &amp; Goodrich, D.</span> (2018/2019). Graph drawing by stochastic gradient descent. <em>IEEE TVCG</em> 25(9). arXiv:1710.04626.</li>
+    <li><span class="au">Sugiyama, K., Tagawa, S. &amp; Toda, M.</span> (1981). Methods for visual understanding of hierarchical system structures. <em>IEEE Trans. SMC</em> 11(2), 109–125.</li>
+    <li><span class="au">Dwyer, T., Koren, Y. &amp; Marriott, K.</span> (2006). IPSep-CoLa: incremental separation-constraint layout. <em>IEEE TVCG</em> 12(5), 821–828.</li>
+    <li><span class="au">Dwyer, T.</span> (2009). Scalable, versatile and simple constrained graph layout. <em>Computer Graphics Forum</em> 28(3), 991–998. (cola.js / WebCoLa)</li>
+    <li><span class="au">Hoffswell, J., Borning, A. &amp; Heer, J.</span> (2018). SetCoLa: high-level constraints for graph layout. <em>Computer Graphics Forum</em> 37(3).</li>
+    <li><span class="au">Walshaw, C.</span> (2003). A multilevel algorithm for force-directed graph drawing. <em>JGAA</em> 7(3), 253–285. · <span class="au">Hachul &amp; Jünger</span> (FM³, GD 2004).</li>
+    <li><span class="au">Rodrigues, E. et al.</span> (2011). Group-in-a-Box layout. <em>IEEE SocialCom</em>. · <span class="au">Kieffer, S. et al.</span> (2016). HOLA. <em>IEEE TVCG</em> 22(1), 349–358.</li>
+  </ul>
+
+  <h3>Spatial / semantic embedding &amp; learned layout</h3>
+  <ul>
+    <li><span class="au">Shneiderman, B. &amp; Aris, A.</span> (2006). Network visualization by semantic substrates. <em>IEEE TVCG</em> 12(5), 733–740.</li>
+    <li><span class="au">Brandes, U. &amp; Pich, C.</span> (2006). Eigensolver methods for progressive MDS (PivotMDS). <em>Graph Drawing '06</em>, LNCS 4372. · <span class="au">Harel &amp; Koren</span> (HDE, GD 2002).</li>
+    <li><span class="au">Kruiger, J. et al.</span> (2017). Graph layouts by t-SNE (tsNET). <em>Computer Graphics Forum</em> 36(3).</li>
+    <li><span class="au">Hale, S., McNeill, G. &amp; Bright, J.</span> (2017). Where'd it go? Geographic vs. force-directed layouts. <em>EuroRV³</em>.</li>
+    <li><span class="au">Wang, Y. et al.</span> (2019). DeepDrawing. <em>IEEE VIS/TVCG</em>. · <span class="au">SmartGD</span> (2024), <em>IEEE TVCG</em>. <span class="flag">△ DeepGD venue tentative — cite arXiv:2106.15347.</span></li>
+  </ul>
+
+  <h3>Edges, labels &amp; focus+context</h3>
+  <ul>
+    <li><span class="au">Holten, D. &amp; van Wijk, J.</span> (2009). Force-directed edge bundling. <em>Computer Graphics Forum</em> 28(3), 983–990. · <span class="au">Holten</span> (2006), Hierarchical edge bundles, <em>IEEE TVCG</em> 12(5).</li>
+    <li><span class="au">Wallinger, M. et al.</span> (2022). Edge-Path Bundling. <em>IEEE TVCG</em> 28(1), 313–323.</li>
+    <li><span class="au">Bach, B. et al.</span> (2017). Towards unambiguous edge bundling (confluent drawings). <em>IEEE TVCG</em> 23(1).</li>
+    <li><span class="au">Dickerson, M., Eppstein, D., Goodrich, M. &amp; Meng, J.</span> (2003). Confluent drawings. <em>Graph Drawing '03</em>.</li>
+    <li><span class="au">Selassie, D., Heller, B. &amp; Heer, J.</span> (2011). Divided edge bundling for directional data. <em>IEEE TVCG</em> 17(12).</li>
+    <li><span class="au">Duncan, C. et al.</span> (2012). Lombardi drawings of graphs. <em>JGAA</em> 16(1), 85–108. · <span class="au">Xu, K. et al.</span> (2012). Curved edges user study. <em>Diagrams '12</em>.</li>
+    <li><span class="au">Christensen, J., Marks, J. &amp; Shieber, S.</span> (1995). Point-feature label placement. <em>ACM TOG</em> 14(3), 203–232.</li>
+    <li><span class="au">Gansner, E. &amp; Hu, Y.</span> (2010). Efficient, proximity-preserving node overlap removal (PRISM). <em>JGAA</em> 14(1), 53–74. · <span class="au">Imhof</span> (1975), Positioning names on maps.</li>
+    <li><span class="au">Nöllenburg, M. &amp; Wolff, A.</span> (2011). High-quality metro maps by MIP. <em>IEEE TVCG</em> 17(5), 626–641. · <span class="au">Wang &amp; Chi</span> (2011), Focus+Context metro maps, <em>IEEE TVCG</em> 17(12).</li>
+    <li><span class="au">Furnas, G.</span> (1986). Generalized fisheye views. <em>CHI '86</em>, 16–23. · <span class="au">van Ham, F. &amp; Perer, A.</span> (2009). Search, show context, expand on demand. <em>IEEE TVCG</em> 15(6), 953–960.</li>
+    <li><span class="au">Fekete, J.-D. &amp; Plaisant, C.</span> (1999). Excentric labeling. <em>CHI '99</em>, 512–519.</li>
+  </ul>
+</div>
+
+<div class="foot">
+  Compiled for the EverQuest Qeynos ontology project from four parallel literature reviews (readability &amp; human factors; layout algorithms; spatial/semantic embedding; edges, labels &amp; focus+context). Citations verified during review; items marked △ warrant a final check before external publication. This paper states a direction, not a finished system — Phase 1 (anchored constraint layout) is the recommended next build.
+</div>
+</div>

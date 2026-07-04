@@ -1,0 +1,4 @@
+pymysql
+networkx
+pandas
+numpy

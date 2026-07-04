@@ -1,0 +1,25 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# local MySQL instance + raw DB dumps (large; see README to fetch)
+db/mysql_data/
+db/*.sql
+db/*.tar.gz
+db/*.sock
+db/*.log
+db/mysqld.pid
+
+# third-party quest scripts (clone from EQMacEmu/quests; see README)
+quests/
+
+# dev screenshots, server log, scratch
+analysis/*.png
+server/server.log
+
+# semantic-extraction batch INPUTS (regenerable); out_*.json results are kept
+analysis/dialog_sem/in_*.json
+
+# binary intermediate
+*.pkl
